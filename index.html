@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html class="ng-app">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.min.css" rel="stylesheet">
+    <!-- App/UI -->
+    <!--
+        <link rel="stylesheet" href="//localhost/onboard/ob-style.css" type="text/css" media="screen, projection" />
+    -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script>jQuery.noConflict();</script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.1.5/angular.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
+    <script type='text/javascript' src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
+    <style>
+        body {
+            font-family: "Open Sans", Bitter, sans-serif;
+        }
+        .ob-app {
+            padding:5px;
+        }
+        .alert {
+            padding: 0px !important;
+            color: red;
+        }
+        #login-links-container {
+            background:#56565a;color:#fff;padding:3px;
+        }
+        .login-links {
+            color:#fff;font-weight:bold;text-decoration:none;
+        }
+        .hide {
+            display: none;
+        }
+        .show {
+            display: block;
+        }
+        #signup-form {
+            width: 350px;
+        }
+        input {
+            padding: 0.5em;
+        }
+        input.ng-invalid {
+          border: 1px solid red;
+        }
+        input.ng-valid {
+          border: 1px solid grey;
+        }
+        input[type=checkbox]
+        {
+            /* Double-sized Checkboxes */
+            -ms-transform: scale(1.5); /* IE */
+            -moz-transform: scale(1.5); /* FF */
+            -webkit-transform: scale(1.5); /* Safari and Chrome */
+            -o-transform: scale(1.5); /* Opera */
+            padding: 5px;
+            margin-left: 5px;
+        }
+        select {
+          padding: 0.5em;
+        }
+        small.error {
+            display: block;
+            padding: 0.375em 0.25em;
+            margin-top: 0;
+            margin-bottom: 1em;
+            font-size: 0.75em;
+            font-weight: bold;
+            background: #c60f13;
+            color: white;
+        }
+        button, .button {
+            border-style: solid;
+            border-width: 1px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            line-height: normal;
+            margin: 1em 0 0.5em;
+            position: relative;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+            padding-top: 0.5em;
+            padding-right: 0.65em;
+            padding-bottom: 0.5em;
+            padding-left: 0.5em;
+            font-size: 1em;
+            border-color: #2284a1;
+            color: white;
+        }
+
+        button.disabled {
+            background-color: #ccc;
+        }
+        button.enabled {
+            background-color: #2ba6cb;
+        }
+        button.cancel {
+            background-color: #fff;
+            color: #000;
+        }
+        button.radius, .button.radius {
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+        }
+        .checkboxtext
+        {
+            font-size: 110%;
+            display: inline;
+            margin-left: 5px;
+        }
+        fieldset {
+            border: 1px groove threedface;
+        }
+        .registration {
+            padding-top: 40px;
+        }
+        nav {
+            font-size: 13px;
+            padding-left: 5px;
+            padding-top: 5px;
+        }
+        .navigation a {
+            display: block;
+            position: relative;
+            float: left;
+            height: 32px;
+            box-sizing: border-box;
+            min-height: 2em;
+            
+            margin-right: 2px;
+            margin-bottom: 5px;
+            
+            text-decoration: none;
+            font-family: sans-serif;
+            color: #333;
+        }
+        .navigation a > .upperArrowElement {
+            display: block;
+            width: 100%;
+            height: 50%;
+            position: absolute;
+            -webkit-transform: skewX(35deg);
+            transform: skewX(35deg);
+            background-color: #E5E6E8;
+        }
+        .navigation a > .lowerArrowElement {
+            display: block;
+            width: 100%;
+            height: 50%;
+            position: absolute;
+            bottom: 0;
+            -webkit-transform: skewX(-35deg);
+            transform: skewX(-35deg);
+            background-color: #E5E6E8;
+        }
+        .navigation a:hover > .lowerArrowElement,
+        .navigation a:hover > .upperArrowElement {
+            background-color: #2ba6cb;
+        }
+        .navigation a > .content {
+            display: block;
+            padding: 0.5em 1.3em;
+            position: relative;
+            top: 0;
+            left: 0;
+        }
+        .navigation a:first-child > .content {
+          left: -2px;
+        }
+        .navigation a:first-child::before {
+            content: '';
+            display: block;
+            position: absolute;
+            background-color: #E5E6E8;
+            height: 100%;
+            width: 50%;
+            top: 0;
+            left: -5px;
+            z-index: -1;
+        }
+        .navigation a:first-child::before {
+            background-color: #fff;
+        }
+        .navigation a:first-child:hover::before {
+            background-color: #fff;
+        }
+        .selected {
+            background-color: #2ba6cb !important;
+        }
+        .black {
+            color: #000!important;
+        }
+    </style>
+</head>
+<script>
+    ngLD = angular.module('LD', ['ui','ui.filters']);
+    function Onboarding($scope, $timeout, $http) {
+        // prepare a list of storage providers
+        $scope.locations = [  
+            {locationURI : 'rww.io', LocationName : 'rww.io'},
+            {locationURI : 'data.fm', LocationName : 'data.fm'}
+            ];
+        // select a default storage provider (try local host)
+        $scope.storageLocation = $scope.locations[0].locationURI;
+        // default username
+        $scope.account = 'username';
+        // current step
+        $scope.step = 'start';
+        // create iframe for WebID cert generation
+        f = document.createElement('iframe');
+        f.src = '//'+$scope.storageLocation+'/server.html';
+        f.style.display = 'none';
+        document.body.appendChild(f);
+        window.addEventListener("message", function(ev) {
+            $scope.$apply(function() {
+                console.log(ev.data.response);
+                $scope[ev.data.method+'Data'] = ev.data.response;
+            });
+        });
+        // update storage location
+        $scope.locationUpdate = function() {
+            f.src = '//'+$scope.storageLocation+'/server.html';
+            f.onload = $scope.accountStatus;
+            console.log(f.src);
+        }
+        $scope.storageStatus = function() {
+            f.contentWindow.postMessage({method: 'storageStatus', storageName: $scope.storageName }, "*");
+        }
+        $scope.accountStatus = function() {
+            if ($scope.accountName && $scope.accountName.length > 0)
+                f.contentWindow.postMessage({method: 'accountStatus', accountName: $scope.accountName }, "*");
+        }
+        $scope.accountCreate = function() {
+            window.opener.location='https://'+$scope.accountName+'.'+$scope.storageLocation;
+        }
+        // update account
+        $scope.$watch('accountName', function(newVal, oldVal) {
+            $scope.account = (!newVal || (newVal.length == 0)) ? '<username>' : newVal;
+        });
+        // add or remove the <keygen> element depending whether the user wants a WebID or not (no point wasting time generating keys)
+        $scope.$watch('getWebID', function(newVal, oldVal) {
+            console.log(newVal, oldVal);
+            if (newVal == false)
+                jQuery('#onboarding').append('<keygen class="spkac" name="SPKAC" challenge="randomchars" keytype="rsa" style="display:none" />');
+            else if (newVal == true && jQuery('.spkac'))
+                jQuery('.spkac').remove();
+        });
+        // try to authenticate to a WebID-TLS server to receive the User: header
+        $scope.doLogin = function() {
+            $http({
+                url: "https://login.rww.io/",
+                method: "HEAD"
+            }).success(function(data, status, headers, config) {
+                var user = headers('User'); // look for User: header
+                if (user)
+                    parent.postMessage('User:'+headers('User'),$scope.getParam('ref')); // pass WebID to the parent window
+            }).error(function(data, status, headers, config) {
+                var user = headers('User');
+                if (user)
+                    parent.postMessage('User:'+headers('User'),$scope.getParam('ref'));
+            });
+            parent.postMessage('Close',$scope.getParam('ref')); // signal to close the modal
+        }
+        // get parameter value from URI
+        $scope.getParam = function( name ) {
+            name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+            var regexS = "[\\?&]"+name+"=([^&#]*)";
+            var regex = new RegExp( regexS );
+            var results = regex.exec(window.location.href);
+            if( results == null )
+                return "";
+            else
+                return results[1];
+            }
+        }
+</script>
+<body ng-controller="Onboarding">
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#login" data-toggle="tab">Login</a></li>
+        <li><a href="#signup" data-toggle="tab">Sign Up</a></li>
+    </ul>
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="login">
+            <div>
+                <br>
+                <p>If you have a WebID, choose a prefered authentication server then please click the button below to log in.</p>
+                <p>
+                    Athentication server:
+                    <select ng-model="storageLocation" ng-options="item.locationURI as item.LocationName for item in locations" ng-change="locationUpdate()"></select>
+                </p>
+                <p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login with your WebID</button></p>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="signup">
+            <nav class="navigation">
+                <a href="#start" ng-click="step='start'">
+                  <span class="upperArrowElement" ng-class="step=='start'?'selected':''"></span>
+                  <span class="lowerArrowElement" ng-class="step=='start'?'selected':''"></span>
+                  <span class="content">Getting Started</span>
+                </a>
+                <a href="#signup" ng-click="step='signup'">
+                  <span class="upperArrowElement" ng-class="step=='signup'?'selected':''"></span>
+                  <span class="lowerArrowElement" ng-class="step=='signup'?'selected':''"></span>
+                  <span class="content">Sign Up</span>
+                </a>
+                <a href="#login" ng-click="step='login'">
+                  <span class="upperArrowElement" ng-class="step=='login'?'selected':''"></span>
+                  <span class="lowerArrowElement" ng-class="step=='login'?'selected':''"></span>
+                  <span class="content">Login</span>
+                </a>
+            </nav>
+            <div class="center registration">
+                <!-- GET STARTED -->
+                <fieldset class="panel" ng-show="step=='start'">
+                    <legend><strong>Getting Started</strong></legend>
+                    <div>
+                        <p>This process will help you get set up with a unique WebID (in case you don't have one) as well as dedicated personal data store (think of it as Dropbox but for Linked Data).</p>
+                        <p>Since WebID doesn't rely on passwords, every time you login with WebID, a certificate selection dialog will pop up. To login, you just have to select the WebID certificate you want to use.</p>
+                        <p><button type="submit" ng-click="step='signup'" class="btn btn-primary">Start</button></p>
+                    </div>
+                </fieldset>
+                <!-- SIGN UP -->
+                <fieldset class="panel" ng-show="step=='signup'">
+                    <legend><strong>Sign up for WebID &amp; storage</strong></legend>
+                    <div>
+                        <form method="POST" id="onboarding" name="onboarding" action="/api/spkac" target="spkac">
+                        <keygen class="spkac" name="SPKAC" challenge="randomchars" keytype="rsa" style="display:none" />
+                        <p><input type="checkbox" name="webid" ng-model="getWebID" /><span class="checkboxtext">I have a WebID, I just want storage.</span></p>
+                        <p>Name: <input type="text" name="name" ng-model="name" placeholder="your full name" ng-disabled="getWebID" class="clear" ng-minlength=2 ng-maxlength=50 required /> <small>(2 characters min.)</small></p>
+                        <p>Email: &nbsp;<input type="email" name="email" ng-model="email" placeholder="you@somewhere.com" ng-disabled="getWebID" class="clear" /> <small>(optional)</small></p>
+                        <p>https:// <input type="text" name="username" ng-model="accountName" ng-change="accountStatus()" placeholder="username" class="clear" ng-class="accountStatusData.available ? 'ng-valid':'ng-invalid'" required /> <b>.</b> <select ng-model="storageLocation" ng-options="item.locationURI as item.LocationName for item in locations" ng-change="locationUpdate()"></select></p>
+                        <span><small>Your WebID: <em>https://</em><b ng-class="!accountStatusData.available && accountName ? 'alert':''">{{account}}</b>.<em>{{storageLocation}}/profile/card#me</em></small></span><br/>
+                        <span><small>Your storage: <em>https://</em><b ng-class="!accountStatusData.available && accountName ? 'alert':''">{{account}}</b>.<em>{{storageLocation}}/</em></small></span>
+                        <br>
+                        <p><button type="submit" ng-click="step='login'" ng-disabled="!accountStatusData.available || (!name && !getWebID) || !accountName" ng-class="!accountStatusData.available || (!name && !getWebID) || !accountName ? 'disabled btn-danger':'btn-success'" class="btn">Create</button>
+                        <button type="cancel" ng-click="step='start'" class="btn btn-default cancel">Back</button>
+                        </p>
+                      </form>
+                    </div>
+                    <iframe class="push-2" name="spkac" style="height: 5em; display:none;"></iframe>
+                </fieldset>
+                <!-- LOGIN -->
+                <fieldset class="panel" ng-show="step=='login'">
+                    <legend><strong>Login with your new WebID</strong></legend>
+                    <div ng-hide="!accountStatusData.available || (!name && !getWebID) || !accountName">
+                        <p>Congratulations! You now have a WebID.</p>
+                        <p>Click <a href="https://{{account}}.{{storageLocation}}/profile/card#me" target="_blank">here</a> to view your WebID profile.</p>
+                        <p>Click <a href="https://{{account}}.{{storageLocation}}" target="_blank">here</a> to be redirected to your personal data store. You can also click the button below to close this window.</p>
+                        <p>Once you close this window, you will be able to log in with your new WebID.</p>
+                    </div>
+                    <div ng-show="!accountStatusData.available || (!name && !getWebID) || !accountName">
+                        <p>You have not yet completed the singup process. Please click the Back button to return to the previous step.</p>
+                    </div>
+                    <p>
+                        <button type="cancel" ng-click="step='signup'" class="btn btn-default">Back</button>
+                    </p>
+                </fieldset>
+            </div>
+        </div>            
+    </div>
+   
+    <div class="clearfix"></div>
+</body>
+</html>
