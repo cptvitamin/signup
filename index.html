@@ -331,7 +331,7 @@
                 <fieldset class="panel" ng-show="step=='signup'">
                     <legend><strong>Sign up for WebID &amp; storage</strong></legend>
                     <div>
-                        <form method="POST" id="onboarding" name="onboarding" action="/api/spkac" target="spkac">
+                        <form method="POST" id="onboarding" name="onboarding" action="https://{{storageLocation}}/api/spkac" target="spkac">
                         <keygen class="spkac" name="SPKAC" challenge="randomchars" keytype="rsa" style="display:none" />
                         <p><input type="checkbox" name="webid" ng-model="getWebID" /><span class="checkboxtext">I have a WebID, I just want storage.</span></p>
                         <p>Name: <input type="text" name="name" ng-model="name" placeholder="your full name" ng-disabled="getWebID" class="clear" ng-minlength=2 ng-maxlength=50 required /> <small>(2 characters min.)</small></p>
