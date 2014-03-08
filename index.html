@@ -346,9 +346,9 @@
                 <fieldset class="panel" ng-show="step=='login'">
                     <legend><strong>Login with your new WebID</strong></legend>
                     <div ng-hide="!accountStatusData.available || (!name && !getWebID) || !accountName">
-                        <p>Congratulations! Your new WebID is:</p>
+                        <p>Your new WebID is:</p>
                         <p><a href="https://{{account}}.{{storageLocation}}/profile/card#me" target="_blank">https://{{account}}.{{storageLocation}}/profile/card#me</p>
-			<p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login with your new WebID</button></p>
+			<p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login using WebID</button></p>
                     </div>
                     <div ng-show="!accountStatusData.available || (!name && !getWebID) || !accountName">
                         <p>You have not yet completed the singup process. Please click the Back button to return to the previous step.</p>
