@@ -290,11 +290,6 @@
         <div class="tab-pane active" id="login">
             <div>
                 <br>
-                <p>If you have a WebID, choose a prefered authentication server then please click the button below to log in.</p>
-                <p>
-                    Athentication server:
-                    <select ng-model="storageLocation" ng-options="item.locationURI as item.LocationName for item in locations" ng-change="locationUpdate()"></select>
-                </p>
                 <p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login with your WebID</button></p>
             </div>
         </div>
@@ -351,10 +346,9 @@
                 <fieldset class="panel" ng-show="step=='login'">
                     <legend><strong>Login with your new WebID</strong></legend>
                     <div ng-hide="!accountStatusData.available || (!name && !getWebID) || !accountName">
-                        <p>Congratulations! You now have a WebID.</p>
-                        <p>Click <a href="https://{{account}}.{{storageLocation}}/profile/card#me" target="_blank">here</a> to view your WebID profile.</p>
-                        <p>Click <a href="https://{{account}}.{{storageLocation}}" target="_blank">here</a> to be redirected to your personal data store. You can also click the button below to close this window.</p>
-                        <p>Once you close this window, you will be able to log in with your new WebID.</p>
+                        <p>Congratulations! Your new WebID is:</p>
+                        <p><a href="https://{{account}}.{{storageLocation}}/profile/card#me" target="_blank">https://{{account}}.{{storageLocation}}/profile/card#me</p>
+			<p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login with your new WebID</button></p>
                     </div>
                     <div ng-show="!accountStatusData.available || (!name && !getWebID) || !accountName">
                         <p>You have not yet completed the singup process. Please click the Back button to return to the previous step.</p>
