@@ -15,9 +15,9 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
     <script type='text/javascript' src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <style>
-        body {
-            font-family: "Open Sans", Bitter, sans-serif;
-        }
+        body { font-family: "Open Sans", Bitter, sans-serif; overflow:hidden;}
+        #login { width:380px; height:200px;}
+        #signup { width:380px; height:400px; }
         .ob-app {
             padding:5px;
         }
@@ -125,6 +125,7 @@
             padding-top: 5px;
         }
         .navigation a {
+            cursor: default;
             display: block;
             position: relative;
             float: left;
@@ -157,10 +158,6 @@
             -webkit-transform: skewX(-35deg);
             transform: skewX(-35deg);
             background-color: #E5E6E8;
-        }
-        .navigation a:hover > .lowerArrowElement,
-        .navigation a:hover > .upperArrowElement {
-            background-color: #2ba6cb;
         }
         .navigation a > .content {
             display: block;
@@ -199,7 +196,7 @@
 </head>
 <script>
     ngLD = angular.module('LD', ['ui','ui.filters']);
-    function Onboarding($scope, $timeout, $http) {
+    function Onboarding($scope, $timeout, $window, $http) {
         // prepare a list of storage providers
         $scope.locations = [  
             {locationURI : 'rww.io', LocationName : 'rww.io'},
@@ -222,6 +219,7 @@
                 $scope[ev.data.method+'Data'] = ev.data.response;
             });
         });
+
         // update storage location
         $scope.locationUpdate = function() {
             f.src = '//'+$scope.storageLocation+'/server.html';
@@ -257,14 +255,15 @@
                 method: "HEAD"
             }).success(function(data, status, headers, config) {
                 var user = headers('User'); // look for User: header
-                if (user)
+                if (user && $scope.getParam('ref'))
                     parent.postMessage('User:'+headers('User'),$scope.getParam('ref')); // pass WebID to the parent window
             }).error(function(data, status, headers, config) {
                 var user = headers('User');
-                if (user)
+                if (user && $scope.getParam('ref'))
                     parent.postMessage('User:'+headers('User'),$scope.getParam('ref'));
             });
-            parent.postMessage('Close',$scope.getParam('ref')); // signal to close the modal
+            if ($scope.getParam('ref'))
+                parent.postMessage('Close',$scope.getParam('ref')); // signal to close the modal
         }
         // get parameter value from URI
         $scope.getParam = function( name ) {
@@ -276,14 +275,22 @@
                 return "";
             else
                 return results[1];
+        }
+        
+        // pass element dimensions to the parent window
+        $scope.resize = function (eid) {
+            if ($scope.getParam('ref')) {
+                var w = jQuery('#'+eid);
+                parent.postMessage('iframe='+w.width()+':'+w.height(),$scope.getParam('ref')); 
             }
         }
+    }
 </script>
-<body ng-controller="Onboarding">
+<body id="body" ng-controller="Onboarding">
     <!-- Nav tabs -->
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#login" data-toggle="tab">Login</a></li>
-        <li><a href="#signup" data-toggle="tab">Sign Up</a></li>
+        <li class="active"><a href="#login" data-toggle="tab" ng-click="resize('login')">Login</a></li>
+        <li><a href="#signup" data-toggle="tab" ng-click="resize('signup')">Sign Up</a></li>
     </ul>
     <!-- Tab panes -->
     <div class="tab-content">
@@ -296,17 +303,17 @@
 
         <div class="tab-pane" id="signup">
             <nav class="navigation">
-                <a href="#start" ng-click="step='start'">
+                <a href="#" disabled>
                   <span class="upperArrowElement" ng-class="step=='start'?'selected':''"></span>
                   <span class="lowerArrowElement" ng-class="step=='start'?'selected':''"></span>
                   <span class="content">Getting Started</span>
                 </a>
-                <a href="#signup" ng-click="step='signup'">
+                <a href="#">
                   <span class="upperArrowElement" ng-class="step=='signup'?'selected':''"></span>
                   <span class="lowerArrowElement" ng-class="step=='signup'?'selected':''"></span>
                   <span class="content">Sign Up</span>
                 </a>
-                <a href="#login" ng-click="step='login'">
+                <a href="#">
                   <span class="upperArrowElement" ng-class="step=='login'?'selected':''"></span>
                   <span class="lowerArrowElement" ng-class="step=='login'?'selected':''"></span>
                   <span class="content">Login</span>
@@ -347,8 +354,8 @@
                     <legend><strong>Login with your new WebID</strong></legend>
                     <div ng-hide="!accountStatusData.available || (!name && !getWebID) || !accountName">
                         <p>Your new WebID is:</p>
-                        <p><a href="https://{{account}}.{{storageLocation}}/profile/card#me" target="_blank">https://{{account}}.{{storageLocation}}/profile/card#me</p>
-			<p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login using WebID</button></p>
+                        <p><a href="https://{{account}}.{{storageLocation}}/profile/card#me" target="_blank">https://{{account}}.{{storageLocation}}/profile/card#me</a></p>
+			             <p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login using WebID</button></p>
                     </div>
                     <div ng-show="!accountStatusData.available || (!name && !getWebID) || !accountName">
                         <p>You have not yet completed the singup process. Please click the Back button to return to the previous step.</p>
