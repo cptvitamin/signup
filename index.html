@@ -252,7 +252,8 @@
         $scope.doLogin = function() {
             $http({
                 url: "https://login.rww.io/",
-                method: "HEAD"
+                method: "HEAD",
+                withCredentials: true,
             }).success(function(data, status, headers, config) {
                 var user = headers('User'); // look for User: header
                 if (user && $scope.getParam('ref'))
