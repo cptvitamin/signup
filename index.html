@@ -43,11 +43,17 @@
         input {
             padding: 0.5em;
         }
+        input[type=text] {
+            width: 200px;
+        }
+        input[type=email] {
+            width: 200px;
+        }
         input.ng-invalid {
           border: 1px solid red;
         }
         input.ng-valid {
-          border: 1px solid grey;
+          border: 1px solid green;
         }
         input[type=checkbox]
         {
@@ -337,12 +343,10 @@
                         <form method="POST" id="onboarding" name="onboarding" action="https://{{storageLocation}}/api/spkac" target="spkac">
                         <keygen class="spkac" name="SPKAC" challenge="randomchars" keytype="rsa" style="display:none" />
                         <p><input type="checkbox" name="webid" ng-model="getWebID" /><span class="checkboxtext">I have a WebID, I just want storage.</span></p>
-                        <p>Name: <input type="text" name="name" ng-model="name" placeholder="your full name" ng-disabled="getWebID" class="clear" ng-minlength=2 ng-maxlength=50 required /> <small>(2 characters min.)</small></p>
+                        <p>Name: &nbsp;<input type="text" name="name" ng-model="name" placeholder="your full name" ng-disabled="getWebID" class="clear" ng-minlength=2 ng-maxlength=50 required /> <small>(2 characters min.)</small></p>
                         <p>Email: &nbsp;<input type="email" name="email" ng-model="email" placeholder="you@somewhere.com" ng-disabled="getWebID" class="clear" /> <small>(optional)</small></p>
                         <p>https:// <input type="text" name="username" ng-model="accountName" ng-change="accountStatus()" placeholder="username" class="clear" ng-class="accountStatusData.available ? 'ng-valid':'ng-invalid'" required /> <b>.</b> <select ng-model="storageLocation" ng-options="item.locationURI as item.LocationName for item in locations" ng-change="locationUpdate()"></select></p>
-                        <span><small>Your WebID: <em>https://</em><b ng-class="!accountStatusData.available && accountName ? 'alert':''">{{account}}</b>.<em>{{storageLocation}}/profile/card#me</em></small></span><br/>
-                        <span><small>Your storage: <em>https://</em><b ng-class="!accountStatusData.available && accountName ? 'alert':''">{{account}}</b>.<em>{{storageLocation}}/</em></small></span>
-                        <br>
+                        <p ng-show="!accountStatusData.available && accountName">Sorry, <strong>{{account}}</strong> is taken.</p>
                         <p><button type="submit" ng-click="step='login'" ng-disabled="!accountStatusData.available || (!name && !getWebID) || !accountName" ng-class="!accountStatusData.available || (!name && !getWebID) || !accountName ? 'disabled btn-danger':'btn-success'" class="btn">Create</button>
                         <button type="cancel" ng-click="step='start'" class="btn btn-default cancel">Back</button>
                         </p>
@@ -354,9 +358,11 @@
                 <fieldset class="panel" ng-show="step=='login'">
                     <legend><strong>Login with your new WebID</strong></legend>
                     <div ng-hide="!accountStatusData.available || (!name && !getWebID) || !accountName">
-                        <p>Your new WebID is:</p>
+                        <p>Your new WebID:</p>
                         <p><a href="https://{{account}}.{{storageLocation}}/profile/card#me" target="_blank">https://{{account}}.{{storageLocation}}/profile/card#me</a></p>
-			             <p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login using WebID</button></p>
+                        <p>Your new storage space:</p>
+                        <p><a href="https://{{account}}.{{storageLocation}}/" target="_blank">https://{{account}}.{{storageLocation}}/</a></p>
+			            <p><button type="submit" ng-click="doLogin()" class="btn btn-info enabled">Login using WebID</button></p>
                     </div>
                     <div ng-show="!accountStatusData.available || (!name && !getWebID) || !accountName">
                         <p>You have not yet completed the singup process. Please click the Back button to return to the previous step.</p>
