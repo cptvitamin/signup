@@ -259,6 +259,7 @@
             $http({
                 url: "https://login.rww.io/",
                 method: "HEAD",
+                headers: { 'Accept': '*/*' }, // Firefox misbehaves if we don't set the Accept header
                 withCredentials: true,
             }).success(function(data, status, headers, config) {
                 var user = headers('User'); // look for User: header
