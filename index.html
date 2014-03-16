@@ -15,11 +15,15 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui/0.4.0/angular-ui.min.js"></script>
     <script type='text/javascript' src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script>
     <style>
-        body { font-family: "Open Sans", Bitter, sans-serif; overflow:hidden;}
-        #login { width:380px; height:200px;}
-        #signup { width:380px; height:400px; }
+        body { font-family: "Open Sans", Bitter, sans-serif; overflow:hidden; padding:5px;}
+        #login { width:350px; height:200px;}
+        #signup { width:350px; height:400px; }
         .ob-app {
             padding:5px;
+        }
+        .panel {
+            -webkit-box-shadow: 0px;
+            box-shadow: 0px; 
         }
         .alert {
             padding: 0px !important;
@@ -44,10 +48,23 @@
             padding: 0.5em;
         }
         input[type=text] {
-            width: 200px;
+            width: 250px;
         }
         input[type=email] {
-            width: 200px;
+            width: 250px;
+        }
+        /*
+        input[type=file] {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            opacity: 0;
+            width: 80px;
+            height: 110px;
+        }
+        */
+        input[type=file] {
+            width:150px;
         }
         input.ng-invalid {
           border: 1px solid red;
@@ -64,6 +81,9 @@
             -o-transform: scale(1.5); /* Opera */
             padding: 5px;
             margin-left: 5px;
+        }
+        .short {
+            width: 150px!important;
         }
         select {
           padding: 0.5em;
@@ -98,7 +118,6 @@
             border-color: #2284a1;
             color: white;
         }
-
         button.disabled {
             background-color: #ccc;
         }
@@ -112,6 +131,21 @@
         button.radius, .button.radius {
             -webkit-border-radius: 3px;
             border-radius: 3px;
+        }
+        .pull-right {
+            float: right!important;
+        }
+        .center-text {
+            text-align:center;
+        }
+        .avatar {
+            position: absolute;
+            float:right;
+            right: 10px;
+            top: 170px;
+            z-index:0;
+            text-align: center;
+            border: 1px solid;
         }
         .checkboxtext
         {
@@ -329,34 +363,37 @@
             </nav>
             <div class="center registration">
                 <!-- GET STARTED -->
-                <fieldset class="panel" ng-show="step=='start'">
+                <div ng-show="step=='start'">
                     <legend><strong>Getting Started</strong></legend>
                     <div>
                         <p>This process will help you get set up with a unique WebID (in case you don't have one) as well as dedicated personal data store (think of it as Dropbox but for Linked Data).</p>
                         <p>Since WebID doesn't rely on passwords, every time you login with WebID, a certificate selection dialog will pop up. To login, you just have to select the WebID certificate you want to use.</p>
                         <p><button type="submit" ng-click="step='signup'" class="btn btn-primary">Start</button></p>
                     </div>
-                </fieldset>
+                </div>
                 <!-- SIGN UP -->
-                <fieldset class="panel" ng-show="step=='signup'">
+                <div ng-show="step=='signup'">
                     <legend><strong>Sign up for WebID &amp; storage</strong></legend>
                     <div>
                         <form method="POST" id="onboarding" name="onboarding" action="https://{{storageLocation}}/api/spkac" target="spkac">
                         <keygen class="spkac" name="SPKAC" challenge="randomchars" keytype="rsa" style="display:none" />
-                        <p><input type="checkbox" name="webid" ng-model="getWebID" /><span class="checkboxtext">I have a WebID, I just want storage.</span></p>
-                        <p>Name: &nbsp;<input type="text" name="name" ng-model="name" placeholder="your full name" ng-disabled="getWebID" class="clear" ng-minlength=2 ng-maxlength=50 required /> <small>(2 characters min.)</small></p>
-                        <p>Email: &nbsp;<input type="email" name="email" ng-model="email" placeholder="you@somewhere.com" ng-disabled="getWebID" class="clear" /> <small>(optional)</small></p>
-                        <p>https:// <input type="text" name="username" ng-model="accountName" ng-change="accountStatus()" placeholder="username" class="clear" ng-class="accountStatusData.available ? 'ng-valid':'ng-invalid'" required /> <b>.</b> <select ng-model="storageLocation" ng-options="item.locationURI as item.LocationName for item in locations" ng-change="locationUpdate()"></select></p>
-                        <p ng-show="!accountStatusData.available && accountName">Sorry, <strong>{{account}}</strong> is taken.</p>
-                        <p><button type="submit" ng-click="step='login'" ng-disabled="!accountStatusData.available || (!name && !getWebID) || !accountName" ng-class="!accountStatusData.available || (!name && !getWebID) || !accountName ? 'disabled btn-danger':'btn-success'" class="btn">Create</button>
-                        <button type="cancel" ng-click="step='start'" class="btn btn-default cancel">Back</button>
-                        </p>
+                        <table border="0">
+                        <tr><td colspan="2"><input type="checkbox" name="webid" ng-model="getWebID" /><span class="checkboxtext">I have a WebID, I just want storage.</span></td></tr>
+                        <tr><td>Full name:</td><td><input type="text" name="name" ng-model="name" placeholder="your full name" ng-disabled="getWebID" class="clear" ng-minlength=2 ng-maxlength=50 required /></td></tr>
+                        <tr><td>Email:</td><td><input type="email" name="email" ng-model="email" placeholder="(optional)" ng-disabled="getWebID" class="clear" /></td></tr>
+                        <tr><td>Photo URI:</td><td><input id="img" type="text" name="img" placeholder="(optional)" ng-model="img"></td></tr>
+                        <tr><td>https://</td><td><input type="text" name="username" ng-model="accountName" ng-change="accountStatus()" placeholder="username" class="clear short" ng-class="accountStatusData.available ? 'ng-valid':'ng-invalid'" required /> <b>.</b> <select ng-model="storageLocation" ng-options="item.locationURI as item.LocationName for item in locations" ng-change="locationUpdate()"></select></td></tr>
+                        <tr><td></td><td><span ng-show="!accountStatusData.available && accountName">Sorry, <strong>{{account}}</strong> is taken.</span></td></tr>
+                        <tr><td colspan="2"><button type="submit" ng-click="step='login'" ng-disabled="!accountStatusData.available || (!name && !getWebID) || !accountName" ng-class="!accountStatusData.available || (!name && !getWebID) || !accountName ? 'disabled btn-danger':'btn-success'" class="btn">Create</button>
+                            <button type="cancel" ng-click="step='start'" class="btn btn-default cancel">Back</button>
+                        </td></tr>
+                        </table>
                       </form>
                     </div>
                     <iframe class="push-2" name="spkac" style="height: 5em; display:none;"></iframe>
-                </fieldset>
+                </div>
                 <!-- LOGIN -->
-                <fieldset class="panel" ng-show="step=='login'">
+                <div ng-show="step=='login'">
                     <legend><strong>Login with your new WebID</strong></legend>
                     <div ng-hide="!accountStatusData.available || (!name && !getWebID) || !accountName">
                         <p>Your new WebID:</p>
@@ -371,7 +408,7 @@
                     <p>
                         <button type="cancel" ng-click="step='signup'" class="btn btn-default">Back</button>
                     </p>
-                </fieldset>
+                </div>
             </div>
         </div>            
     </div>
