@@ -294,7 +294,7 @@
                 url: "https://login.rww.io/",
                 method: "HEAD",
                 headers: { 'Accept': '*/*' }, // Firefox misbehaves if we don't set the Accept header
-                //withCredentials: true, // This seems to break WebID-TLS login (using random certs)
+                withCredentials: true, // This seems to break WebID-TLS login (using random certs)
             }).success(function(data, status, headers, config) {
                 var user = headers('User'); // look for User: header
                 if (user && $scope.getParam('ref'))
