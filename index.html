@@ -291,7 +291,7 @@
         // try to authenticate to a WebID-TLS server to receive the User: header
         $scope.doLogin = function() {
             $http({
-                url: "https://login.rww.io/",
+                url: "https://rww.io/",
                 method: "HEAD",
                 headers: { 'Accept': '*/*' }, // Firefox misbehaves if we don't set the Accept header
                 withCredentials: true, // This seems to break WebID-TLS login (using random certs)
