@@ -1,0 +1,42 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/paper-button/paper-button.html">
+
+<polymer-element name="webid-signup-login">
+  <template>
+    <style>
+    :host {
+      display: block;
+      position: relative;
+      background-color: white;
+      padding: 20px;
+      width: 100%;
+      font-size: 1.2rem;
+      font-weight: 300;
+    }
+    .login-header {
+      margin-bottom: 10px;
+    }
+    paper-button.colored {
+      background: #4285f4;
+      color: #fff;
+    }
+    polyfill-next-selector { content: '.login-header h2'; }
+    .login-header ::content h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 300;
+    }
+    </style>
+
+    <div class="login-header" layout horizontal center-justified>
+      <content select="h2"></content>
+    </div>
+    <content></content>
+    <div horizontal center-justified layout>
+      <paper-button raised="" class="colored" role="button" tabindex="0" center>Login</paper-button>
+    </div>
+  </template>
+  <script>
+  Polymer({});
+  </script>
+</polymer-element>

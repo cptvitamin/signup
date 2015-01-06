@@ -1,0 +1,300 @@
+<link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/core-icon-button/core-icon-button.html">
+<link rel="import" href="/bower_components/paper-input/paper-input-decorator.html">
+<link rel="import" href="/bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="/bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="/bower_components/core-label/core-label.html">
+<link rel="import" href="/bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="/bower_components/core-overlay/core-overlay.html">
+<link rel="import" href="/bower_components/core-transition/core-transition.html">
+<link rel="import" href="/bower_components/core-icon-button/core-icon-button.html">
+
+<script src="/js/signup.js"></script>
+
+<polymer-element name="webid-signup">
+  <template>
+    <style>
+    :host {
+      display: block;
+      position: relative;
+      background-color: white;
+      padding: 20px;
+      width: 100%;
+      font-size: 1.2rem;
+      font-weight: 300;
+    }
+    core-icon-button {
+      color: #3e50b4;
+    }
+    core-overlay {
+      background: #fff;
+      padding: 30px 42px;
+      margin: 40px;
+    }
+    paper-checkbox {
+      margin-right: 10px;
+    }
+    .signup-header {
+      margin-bottom: 10px;
+    }
+    paper-button.bluecolored {
+      background: #4285f4;
+      color: #fff;
+    }
+    paper-button.greencolored {
+      background: #66BB6A;
+      color: #fff;
+    }
+    polyfill-next-selector { content: '.signup-header h2'; }
+    .signup-header ::content h2 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 300;
+    }
+    .check {
+      margin-top: 10px;
+    }
+    paper-spinner {
+      margin-left: 5px;
+    }
+    paper-spinner.white::shadow .circle {
+      border-color: #fff;
+    }
+    #submit {
+      margin-top: 10px;
+    }
+    </style>
+
+    <!-- AJAX GOES HERE -->
+
+    <core-ajax id="ajax" url="https://rww.io/api/accountStatus" handleAs="json" on-core-response="{{ajaxResponse}}" on-core-complete="{{ajaxDone}}"></core-ajax>
+    <core-ajax id="spkac" url="https://rww.io/api/spkac" on-core-response="{{spkacResponse}}" on-core-complete="{{spkacDone}}"></core-ajax>
+
+    <!-- SIGNUP HEADER -->
+
+    <div class="signup-header" layout horizontal center>
+      <content select="h2"></content>
+      <core-icon-button icon="help" onclick="webidHelp()" alt="Tell me more about WebID."></core-icon-button>
+    </div>
+
+    <!-- HELP OVERLAYS -->
+    <core-overlay id="webidhelp" backdrop="true">
+      <h2>What is a WebID?</h2>
+      <div>
+        <p>A Web ID is a URL for you. It allows you to set up a public profile,
+        with friends, pictures and all kinds of things.</p>
+
+        <p>It works like having an account on a social networking site, but it
+        isn't restricted to just that site. It is very open because the information
+        can connect to other people, organizations and projects and so on, without
+        everyon having to join the same social networking site. All you need is
+        some place on the web where you can save a file to.
+        (<a href="http://www.w3.org/wiki/WebID" target="blank">More information</a>)
+        </p>
+      </div>
+      <h2>What is storage?</h2>
+      <div>
+        <p>When you create a new account, you may also get storage space on the
+          selected server. The amount of available space can vary from server to
+          server. Additionally, a common list of workspaces (i.e. folders) maye be
+          created by default, such as <i>Public</i>, <i>Private</i>, <i>Family</i>,
+          <i>Work</i>, etc.</p>
+      </div>
+      <paper-button raised="" core-overlay-toggle aria-label="Close help overlay">Close</paper-button>
+    </core-overlay>
+
+    <!-- FORM FIELDS -->
+    <div>
+      <core-label center horizontal layout id="webidcheckbox">
+        <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID, I just want storage space.</span>
+      </core-label>
+      <keygen id="spkacWebID" name="SPKAC" challenge="randomchars" keytype="rsa" hidden>
+    </div>
+    <paper-input-decorator id="username" label="Preferred account name" floatinglabel="" error="Account name is required" layout="" vertical="">
+      <input is="core-input" required="" on-input="{{updateUsername}}">
+    </paper-input-decorator>
+    <paper-input-decorator id="fullname" label="Your full name" floatinglabel="" error="Full name is required" layout="" vertical="">
+      <input is="core-input" required="" on-input="{{updateName}}">
+    </paper-input-decorator>
+    <paper-input-decorator id="email" label="Email (optional)" floatinglabel="" layout="" vertical="">
+      <input is="core-input">
+    </paper-input-decorator>
+    <paper-input-decorator id="picurl" label="Picture URL (optional)" floatinglabel="" layout="" vertical="">
+      <input is="core-input">
+    </paper-input-decorator>
+
+    <div id="submit">
+      <paper-button id="check" raised="" class="bluecolored" role="button" tabindex="0" center onclick="validateNew()">
+        <span>Check availability</span> <paper-spinner id="checkSpinner" active="true" class="white" alt="Checking availability" hidden></paper-spinner>
+      </paper-button>
+      <paper-button id="create" raised="" class="greencolored" role="button" tabindex="0" center onclick="createNew()" hidden>
+        <span>Create account!</span> <paper-spinner id="createSpinner" active="true" class="white" alt="Creating account" hidden></paper-spinner>
+      </paper-button>
+      <paper-button raised="" role="button" tabindex="0" center onclick="clearAll()">Clear</paper-button>
+    </div>
+  </template>
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+    Polymer({
+      ajaxResponse: function(e, r) {
+        console.log("Checking account name: "+r.response.response.accountName);
+        console.log("Account available: "+r.response.response.available);
+        if (r.response.response.available === true) {
+          this.$.username.isInvalid = false;
+          this.$.check.hidden = true;
+          this.$.create.hidden = false;
+        } else {
+          this.$.username.error = "Account name already taken";
+          this.$.username.isInvalid = true;
+        }
+      },
+      ajaxDone: function() {
+        console.log("Done!");
+        hideCheckSpinner();
+      },
+      toggleWebID: function() {
+        if (d.$.haveWebID.checked === true) {
+          d.$.fullname.hidden = true;
+          d.$.email.hidden = true;
+          d.$.picurl.hidden = true;
+        } else {
+          d.$.fullname.hidden = false;
+          d.$.email.hidden = false;
+          d.$.picurl.hidden = false;
+        }
+      }
+    });
+
+    var ok = true;
+    var d = document.querySelector("webid-signup");
+
+    d.updateUsername = function(e) {
+      validateEmptyUser();
+    }
+
+    d.updateName = function(e) {
+      validateEmptyName();
+    }
+
+    // Check if the account is available
+    function validateNew() {
+      d.$.check.querySelector('span').innerHTML = "Checking...";
+      showCheckSpinner();
+
+      var userOk = validateEmptyUser();
+      var nameOk = validateEmptyName();
+
+      if (userOk === true && nameOk === true) {
+        var data = {
+              method: "accountStatus",
+              accountName: d.$.username.querySelector('input').value
+            };
+
+        var ajax = d.$.ajax;
+
+        ajax.method = 'POST';
+        ajax.handleAs = 'json';
+        ajax.contentType = 'application/json';
+        ajax.body = JSON.stringify(data);
+        ajax.go(); // call the API
+      }
+      d.$.check.querySelector('span').innerHTML = "Check availability"
+    }
+
+    // Claim account on server
+    function createNew() {
+      showCreateSpinner();
+      d.$.create.querySelector('span').innerHTML = "Creating...";
+
+      var username = d.$.username.querySelector('input').value;
+      var fullname = d.$.fullname.querySelector('input').value;
+      var email = d.$.email.querySelector('input').value;
+      var img = d.$.picurl.querySelector('input').value;
+      if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
+        var spkacWebID = d.$.spkackWebID.value;
+      }
+
+      console.log("Creating account: "+username);
+      console.log("INFO: name: "+fullname+" / email: "+email+" / pic: "+pic);
+
+      var spkac = d.$.spkac;
+      spkac.method = 'POST';
+      spkac.params = '{"username":"'+username+'", "email":"'+email+'", "img":"'+img+'"';
+      if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
+        spkac.params += '"spkac":"'+spkacWebID+'"}';
+      }
+      ajax.go(); // call the API
+    }
+
+    function validateEmptyUser() {
+      d.$.check.hidden = false;
+      d.$.create.hidden = true;
+      var user = d.$.username;
+      if (user) {
+        if (user.querySelector('input').validity.valid) {
+          user.isInvalid = false;
+        } else {
+          user.error = "Account name is required";
+          user.isInvalid = true;
+          hideCheckSpinner();
+          return false;
+        }
+      } else {
+        hideCheckSpinner();
+        console.log("Could not find: "+user);
+        return false;
+      }
+      return true;
+    }
+
+    function validateEmptyName() {
+      var name = d.$.fullname;
+      if (name) {
+        if (name.querySelector('input').validity.valid) {
+          name.isInvalid = false;
+        } else if (d.$.haveWebID.checked === true) {
+          return true;
+        } else {
+          name.error = "Full name is required";
+          name.isInvalid = true;
+          hideCheckSpinner();
+          return false;
+        }
+      } else {
+        hideCheckSpinner();
+        console.log("Could not find: "+name);
+        return false;
+      }
+      return true;
+    }
+
+    function clearAll() {
+      d.$.username.querySelector('input').value = "";
+      d.$.fullname.querySelector('input').value = "";
+      d.$.email.querySelector('input').value = "";
+      d.$.picurl.querySelector('input').value = "";
+    }
+
+    function showCheckSpinner() {
+      d.$.checkSpinner.hidden = false;
+    }
+
+    function hideCheckSpinner() {
+      d.$.checkSpinner.hidden = true;
+    }
+
+    function showCreateSpinner() {
+      d.$.createSpinner.hidden = false;
+    }
+
+    function hideCreateSpinner() {
+      d.$.createSpinner.hidden = true;
+    }
+
+    function webidHelp() {
+      var h = d.$.webidhelp.toggle();
+    }
+  </script>
+</polymer-element>
