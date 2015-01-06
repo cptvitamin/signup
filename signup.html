@@ -30,6 +30,7 @@
       background: #fff;
       padding: 30px 42px;
       margin: 40px;
+      overflow: auto;
     }
     paper-checkbox {
       margin-right: 10px;
@@ -106,7 +107,7 @@
     <!-- FORM FIELDS -->
     <div>
       <core-label center horizontal layout id="webidcheckbox">
-        <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID, I just want storage space.</span>
+        <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID.</span>
       </core-label>
       <keygen id="spkacWebID" name="SPKAC" challenge="randomchars" keytype="rsa" hidden>
     </div>
@@ -125,10 +126,10 @@
 
     <div id="submit">
       <paper-button id="check" raised="" class="bluecolored" role="button" tabindex="0" center onclick="validateNew()">
-        <span>Check availability</span> <paper-spinner id="checkSpinner" active="true" class="white" alt="Checking availability" hidden></paper-spinner>
+        <span>Check</span> <paper-spinner id="checkSpinner" active="true" class="white" alt="Checking availability" hidden></paper-spinner>
       </paper-button>
       <paper-button id="create" raised="" class="greencolored" role="button" tabindex="0" center onclick="createNew()" hidden>
-        <span>Create account!</span> <paper-spinner id="createSpinner" active="true" class="white" alt="Creating account" hidden></paper-spinner>
+        <span>Create!</span> <paper-spinner id="createSpinner" active="true" class="white" alt="Creating account" hidden></paper-spinner>
       </paper-button>
       <paper-button raised="" role="button" tabindex="0" center onclick="clearAll()">Clear</paper-button>
     </div>
