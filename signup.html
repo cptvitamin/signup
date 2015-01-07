@@ -7,7 +7,6 @@
 <link rel="import" href="/bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="/bower_components/core-overlay/core-overlay.html">
 <link rel="import" href="/bower_components/core-transition/core-transition.html">
-<link rel="import" href="/bower_components/core-icon-button/core-icon-button.html">
 
 <script src="/js/signup.js"></script>
 
@@ -46,8 +45,11 @@
       background: #66BB6A;
       color: #fff;
     }
+    .greencolor {
+      color: #66BB6A;
+    }
     polyfill-next-selector { content: '.signup-header h2'; }
-    .signup-header ::content h2 {
+    #signup-header ::content h2 {
         margin: 0;
         font-size: 1.8rem;
         font-weight: 300;
@@ -69,14 +71,13 @@
     <!-- AJAX GOES HERE -->
 
     <core-ajax id="ajax" url="https://rww.io/api/accountStatus" handleAs="json" on-core-response="{{ajaxResponse}}" on-core-complete="{{ajaxDone}}"></core-ajax>
-    <core-ajax id="spkac" url="https://rww.io/api/spkac" on-core-response="{{spkacResponse}}" on-core-complete="{{spkacDone}}"></core-ajax>
 
     <!-- SIGNUP HEADER -->
 
-    <div class="signup-header" layout horizontal center>
+    <core-label id="signup-header" layout horizontal center>
       <content select="h2"></content>
       <core-icon-button icon="help" onclick="webidHelp()" alt="Tell me more about WebID."></core-icon-button>
-    </div>
+    </core-label>
 
     <!-- HELP OVERLAYS -->
     <core-overlay id="webidhelp" backdrop="true">
@@ -105,34 +106,51 @@
     </core-overlay>
 
     <!-- FORM FIELDS -->
-    <div>
-      <core-label center horizontal layout id="webidcheckbox">
-        <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID.</span>
-      </core-label>
-      <keygen id="spkacWebID" name="SPKAC" challenge="randomchars" keytype="rsa" hidden>
-    </div>
-    <paper-input-decorator id="username" label="Preferred account name" floatinglabel="" error="Account name is required" layout="" vertical="">
-      <input is="core-input" required="" on-input="{{updateUsername}}">
-    </paper-input-decorator>
-    <paper-input-decorator id="fullname" label="Your full name" floatinglabel="" error="Full name is required" layout="" vertical="">
-      <input is="core-input" required="" on-input="{{updateName}}">
-    </paper-input-decorator>
-    <paper-input-decorator id="email" label="Email (optional)" floatinglabel="" layout="" vertical="">
-      <input is="core-input">
-    </paper-input-decorator>
-    <paper-input-decorator id="picurl" label="Picture URL (optional)" floatinglabel="" layout="" vertical="">
-      <input is="core-input">
-    </paper-input-decorator>
+    <template id="okDialog" hidden>
+      <h2 class="greencolor">Success!</h2>
+      <div id="okAccount" hidden>
+        <p>
+          Your WebID was created successfully!
+        </p>
+      </div>
+      <div id="storage">
+        <p>Your storage space was created. You can view it by visiting this URL:<br/>
+        <a href="https://{{username}}{{storageURL}}" target="blank">https://{{username}}{{storageURL}}</a>
+        </p>
+      </div>
+    </template>
 
-    <div id="submit">
-      <paper-button id="check" raised="" class="bluecolored" role="button" tabindex="0" center onclick="validateNew()">
-        <span>Check</span> <paper-spinner id="checkSpinner" active="true" class="white" alt="Checking availability" hidden></paper-spinner>
-      </paper-button>
-      <paper-button id="create" raised="" class="greencolored" role="button" tabindex="0" center onclick="createNew()" hidden>
-        <span>Create!</span> <paper-spinner id="createSpinner" active="true" class="white" alt="Creating account" hidden></paper-spinner>
-      </paper-button>
-      <paper-button raised="" role="button" tabindex="0" center onclick="clearAll()">Clear</paper-button>
-    </div>
+    <form id="form" method="post" target="spkac">
+      <div>
+        <core-label center horizontal layout id="webidcheckbox">
+          <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID.</span>
+        </core-label>
+        <keygen id="spkacWebID" name="SPKAC" challenge="randomchars" keytype="rsa" hidden>
+      </div>
+      <paper-input-decorator id="username" label="Preferred account name" floatinglabel="" error="Account name is required" layout="" vertical="">
+        <input is="core-input" name="username" required="" on-input="{{updateUsername}}">
+      </paper-input-decorator>
+      <paper-input-decorator id="fullname" label="Your full name" floatinglabel="" error="Full name is required" layout="" vertical="">
+        <input is="core-input" name="name" required="" on-input="{{updateName}}">
+      </paper-input-decorator>
+      <paper-input-decorator id="email" label="Email (optional)" floatinglabel="" layout="" vertical="">
+        <input is="core-input" name="email">
+      </paper-input-decorator>
+      <paper-input-decorator id="img" label="Picture URL (optional)" floatinglabel="" layout="" vertical="">
+        <input is="core-input" name="img">
+      </paper-input-decorator>
+
+      <div id="submit">
+        <paper-button id="check" raised="" class="bluecolored" role="button" tabindex="0" center onclick="validateNew()">
+          <span>Check</span> <paper-spinner id="checkSpinner" active="true" class="white" alt="Checking availability" hidden></paper-spinner>
+        </paper-button>
+        <paper-button id="create" raised="" class="greencolored" role="button" tabindex="0" center onclick="createNew()" hidden>
+          <span>Create!</span> <paper-spinner id="createSpinner" active="true" class="white" alt="Creating account" hidden></paper-spinner>
+        </paper-button>
+        <paper-button raised="" role="button" tabindex="0" center onclick="clearAll()">Clear</paper-button>
+      </div>
+    </form>
+    <iframe id="hiddenframe" name="spkac" onload="iframeLoaded()" sandbox="allow-same-origin" hidden></iframe>
   </template>
 
   <!-- JAVASCRIPT -->
@@ -159,16 +177,23 @@
         if (d.$.haveWebID.checked === true) {
           d.$.fullname.hidden = true;
           d.$.email.hidden = true;
-          d.$.picurl.hidden = true;
+          d.$.img.hidden = true;
         } else {
           d.$.fullname.hidden = false;
           d.$.email.hidden = false;
-          d.$.picurl.hidden = false;
+          d.$.img.hidden = false;
         }
       }
     });
 
+    Polymer('okDialog', {
+      username: ''
+    });
+
     var ok = true;
+    var formAction = "https://rww.io/api/spkac";
+    var storageURL = ".rww.io/";
+    var username = "";
     var d = document.querySelector("webid-signup");
 
     d.updateUsername = function(e) {
@@ -201,7 +226,7 @@
         ajax.body = JSON.stringify(data);
         ajax.go(); // call the API
       }
-      d.$.check.querySelector('span').innerHTML = "Check availability"
+      d.$.check.querySelector('span').innerHTML = "Check"
     }
 
     // Claim account on server
@@ -209,24 +234,28 @@
       showCreateSpinner();
       d.$.create.querySelector('span').innerHTML = "Creating...";
 
-      var username = d.$.username.querySelector('input').value;
+      username = d.$.username.querySelector('input').value;
       var fullname = d.$.fullname.querySelector('input').value;
       var email = d.$.email.querySelector('input').value;
-      var img = d.$.picurl.querySelector('input').value;
-      if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
-        var spkacWebID = d.$.spkackWebID.value;
+      var img = d.$.img.querySelector('input').value;
+      if (d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
+        d.$.spkacWebID.remove();
       }
 
-      console.log("Creating account: "+username);
-      console.log("INFO: name: "+fullname+" / email: "+email+" / pic: "+pic);
+      d.$.form.action = formAction;
+      d.$.form.submit();
+    }
 
-      var spkac = d.$.spkac;
-      spkac.method = 'POST';
-      spkac.params = '{"username":"'+username+'", "email":"'+email+'", "img":"'+img+'"';
-      if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
-        spkac.params += '"spkac":"'+spkacWebID+'"}';
+    function iframeLoaded() {
+      try {
+        d.$.form.hidden = true;
+        d.$.okDialog.hidden = false;
+        if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
+          d.$.okAccount.hidden = false;
+        }
+      } catch(e) {
+        console.log(e);
       }
-      ajax.go(); // call the API
     }
 
     function validateEmptyUser() {
@@ -275,7 +304,7 @@
       d.$.username.querySelector('input').value = "";
       d.$.fullname.querySelector('input').value = "";
       d.$.email.querySelector('input').value = "";
-      d.$.picurl.querySelector('input').value = "";
+      d.$.img.querySelector('input').value = "";
     }
 
     function showCheckSpinner() {
