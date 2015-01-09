@@ -76,14 +76,8 @@
   <!-- main page content will go here -->
 
   <div class="container" layout vertical center>
-    <webid-signup-login>
-      <h2>Login with your existing WebID</h2>
-    </webid-signup-login>
-
-    <webid-signup hidden>
-      <h2>Signup for a new WebID / Storage</h2>
-    </webid-signup>
-
+    <webid-login></webid-login>
+    <webid-signup hidden></webid-signup>
   </div>
 
   </core-header-panel>
@@ -94,10 +88,10 @@
 
     tabs.addEventListener('core-select', function() {
       if (tabs.selected == "login") {
-        document.querySelector('webid-signup-login').hidden = false;
+        document.querySelector('webid-login').hidden = false;
         document.querySelector('webid-signup').hidden = true;
       } else if (tabs.selected == "signup") {
-        document.querySelector('webid-signup-login').hidden = true;
+        document.querySelector('webid-login').hidden = true;
         document.querySelector('webid-signup').hidden = false;
       }
     });

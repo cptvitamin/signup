@@ -63,19 +63,19 @@
     paper-spinner.white::shadow .circle {
       border-color: #fff;
     }
-    #submit {
+    #submit, #webidcheckbox {
       margin-top: 10px;
     }
     </style>
 
     <!-- AJAX GOES HERE -->
 
-    <core-ajax id="ajax" url="https://rww.io/api/accountStatus" handleAs="json" on-core-response="{{ajaxResponse}}" on-core-complete="{{ajaxDone}}"></core-ajax>
+    <core-ajax id="ajax" url="https://rww.io/api/accountStatus" on-core-response="{{ajaxResponse}}" on-core-complete="{{ajaxDone}}"></core-ajax>
 
     <!-- SIGNUP HEADER -->
 
     <core-label id="signup-header" layout horizontal center>
-      <content select="h2"></content>
+      <content select="h2"><h2>Signup for a WebID / Storage</h2></content>
       <core-icon-button icon="help" onclick="webidHelp()" alt="Tell me more about WebID."></core-icon-button>
     </core-label>
 
@@ -156,6 +156,9 @@
   <!-- JAVASCRIPT -->
 
   <script>
+    var formAction = "https://rww.io/api/spkac";
+    var d = document.querySelector("webid-signup");
+
     Polymer({
       ajaxResponse: function(e, r) {
         console.log("Checking account name: "+r.response.response.accountName);
@@ -185,14 +188,6 @@
         }
       }
     });
-
-    Polymer('okDialog', {
-      username: ''
-    });
-
-    var ok = true;
-    var formAction = "https://rww.io/api/spkac";
-    var d = document.querySelector("webid-signup");
 
     d.updateUsername = function(e) {
       validateEmptyUser();

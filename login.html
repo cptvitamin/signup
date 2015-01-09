@@ -1,7 +1,8 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
+<link rel="import" href="/bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="/bower_components/paper-button/paper-button.html">
 
-<polymer-element name="webid-signup-login">
+<polymer-element name="webid-login">
   <template>
     <style>
     :host {
@@ -16,27 +17,94 @@
     .login-header {
       margin-bottom: 10px;
     }
+    .greencolor {
+      color: #66BB6A;
+    }
     paper-button.colored {
       background: #4285f4;
       color: #fff;
     }
     polyfill-next-selector { content: '.login-header h2'; }
-    .login-header ::content h2 {
+    #loginHeader ::content h2 {
         margin: 0;
         font-size: 1.8rem;
         font-weight: 300;
+        margin-bottom: 20px;
+        word-wrap: break-word;
     }
     </style>
 
-    <div class="login-header" layout horizontal center-justified>
-      <content select="h2"></content>
+    <div id="loginHeader" layout horizontal center-justified>
+      <content select="h2"><h2>Login with your WebID</h2></content>
     </div>
     <content></content>
+    <core-ajax id="ajaxLogin" url="https://rww.io/" on-core-response="{{ajaxLoginResponse}}" on-core-complete="{{ajaxLoginDone}}"></core-ajax>
     <div horizontal center-justified layout>
-      <paper-button raised="" class="colored" role="button" tabindex="0" center>Login</paper-button>
+      <paper-button id="loginButton" raised="" class="colored" role="button" tabindex="0" onclick="doLogin()" center>Authenticate</paper-button>
     </div>
   </template>
   <script>
-  Polymer({});
+
+  var l = document.querySelector("webid-login");
+
+  Polymer({
+    ajaxLoginResponse: function(e, r) {
+      console.log(r.xhr);
+
+      var user = r.xhr.getResponseHeader('User'); // look for User: header
+      console.log('User: '+user);
+      if (user) {
+        l.$.loginHeader.querySelector('h2').innerHTML = 'Authenticated WebID: <span class="greencolor">'+user+'</span>';
+        if (getParam('ref').length > 0) {
+          parent.postMessage('User:'+user,getParam('ref')); // pass WebID to the parent window
+        }
+      }
+    },
+    ajaxLoginDone: function() {
+      console.log("Done!");
+      l.$.loginButton.innerHTML = "Authenticated !";
+    }
+  });
+
+  doLogin = function() {
+    l.$.loginButton.innerHTML = "Authenticating..."
+
+    var ajax = l.$.ajaxLogin;
+    ajax.method = 'HEAD';
+    ajax.headers='{"Accept": "*/*"}';
+    ajax.go(); // call the API
+
+
+    /*
+    $http({
+          url: "https://rww.io/",
+          method: "HEAD",
+          withCredentials: true, // This seems to break WebID-TLS login (using random certs)
+      }).success(function(data, status, headers, config) {
+          var user = headers('User'); // look for User: header
+          if (user && $scope.getParam('ref'))
+              parent.postMessage('User:'+headers('User'),$scope.getParam('ref')); // pass WebID to the parent window
+      }).error(function(data, status, headers, config) {
+          var user = headers('User');
+          if (user && $scope.getParam('ref'))
+              parent.postMessage('User:'+headers('User'),$scope.getParam('ref'));
+      });
+      if ($scope.getParam('ref'))
+          parent.postMessage('Close',$scope.getParam('ref')); // signal to close the modal
+      */
+  }
+
+  getParam = function(name) {
+    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    var regexS = "[\\?&]"+name+"=([^&#]*)";
+    var regex = new RegExp(regexS);
+    var results = regex.exec(window.location.href);
+    if( results == null ) {
+      return "";
+    } else {
+      return results[1];
+    }
+  }
+
   </script>
 </polymer-element>
