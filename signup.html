@@ -123,7 +123,7 @@
     <form id="form" method="post" target="spkac">
       <div>
         <core-label center horizontal layout id="webidcheckbox">
-          <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID.</span>
+          <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID</span>
         </core-label>
         <keygen id="spkacWebID" name="SPKAC" challenge="randomchars" keytype="rsa" hidden>
       </div>
@@ -238,11 +238,16 @@
       if (d.$.hiddenframe.addEventListener) {
         d.$.hiddenframe.addEventListener("load", iframeLoaded, false);
       } else {
-        d.$.hiddenframe.attachEvent("onloadeddata", iframeLoaded);
+        d.$.hiddenframe.attachEvent("onload", iframeLoaded);
       }
 
       d.$.form.action = formAction;
       d.$.form.submit();
+
+      var isFF = 'MozAppearance' in document.documentElement.style;
+      if (isFF !== true) {
+        iframeLoaded();
+      }
     }
 
     function iframeLoaded() {
