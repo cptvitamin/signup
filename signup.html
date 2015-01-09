@@ -54,9 +54,6 @@
         font-size: 1.8rem;
         font-weight: 300;
     }
-    .check {
-      margin-top: 10px;
-    }
     paper-spinner {
       margin-left: 5px;
     }
@@ -133,7 +130,7 @@
       <paper-input-decorator id="fullname" label="Your full name" floatinglabel="" error="Full name is required" layout="" vertical="">
         <input is="core-input" name="name" required="" on-input="{{updateName}}">
       </paper-input-decorator>
-      <paper-input-decorator id="email" label="Email (optional)" floatinglabel="" layout="" vertical="">
+      <paper-input-decorator id="email" label="Email (can be used for recovery)" floatinglabel="" layout="" vertical="">
         <input is="core-input" name="email">
       </paper-input-decorator>
       <paper-input-decorator id="img" label="Picture URL (optional)" floatinglabel="" layout="" vertical="">
@@ -165,6 +162,7 @@
         console.log("Account available: "+r.response.response.available);
         if (r.response.response.available === true) {
           this.$.username.isInvalid = false;
+          this.$.username.style.color = '#66BB6A';
           this.$.check.hidden = true;
           this.$.create.hidden = false;
         } else {
