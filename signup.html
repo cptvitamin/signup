@@ -106,7 +106,7 @@
     </core-overlay>
 
     <!-- FORM FIELDS -->
-    <template id="okDialog" hidden>
+    <div id="okDialog" hidden>
       <h2 class="greencolor">Success!</h2>
       <div id="okAccount" hidden>
         <p>
@@ -115,10 +115,10 @@
       </div>
       <div id="storage">
         <p>Your storage space was created. You can view it by visiting this URL:<br/>
-        <a href="https://{{username}}{{storageURL}}" target="blank">https://{{username}}{{storageURL}}</a>
+          <a id="accountUrl" href="" target="blank"></a>
         </p>
       </div>
-    </template>
+    </div>
 
     <form id="form" method="post" target="spkac">
       <div>
@@ -149,8 +149,8 @@
         </paper-button>
         <paper-button raised="" role="button" tabindex="0" center onclick="clearAll()">Clear</paper-button>
       </div>
+      <iframe id="hiddenframe" name="spkac" hidden></iframe>
     </form>
-    <iframe id="hiddenframe" name="spkac" onload="iframeLoaded()" sandbox="allow-same-origin" hidden></iframe>
   </template>
 
   <!-- JAVASCRIPT -->
@@ -192,8 +192,6 @@
 
     var ok = true;
     var formAction = "https://rww.io/api/spkac";
-    var storageURL = ".rww.io/";
-    var username = "";
     var d = document.querySelector("webid-signup");
 
     d.updateUsername = function(e) {
@@ -242,20 +240,33 @@
         d.$.spkacWebID.remove();
       }
 
+      if (d.$.hiddenframe.addEventListener) {
+        d.$.hiddenframe.addEventListener("load", iframeLoaded, false);
+      } else {
+        d.$.hiddenframe.attachEvent("onloadeddata", iframeLoaded);
+      }
+
       d.$.form.action = formAction;
       d.$.form.submit();
     }
 
     function iframeLoaded() {
-      try {
         d.$.form.hidden = true;
+
+        var url = "https://"+d.$.username.querySelector('input').value+".rww.io/";
+        d.$.accountUrl.href = url;
+        d.$.accountUrl.innerHTML = url;
+
         d.$.okDialog.hidden = false;
         if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
           d.$.okAccount.hidden = false;
         }
-      } catch(e) {
-        console.log(e);
-      }
+    }
+
+    function setFormToken() {
+      var webidToken = new Date().getTime();
+      d.$.webidToken.value = webidToken;
+      return webidToken;
     }
 
     function validateEmptyUser() {
