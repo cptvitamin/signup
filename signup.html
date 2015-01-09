@@ -219,7 +219,6 @@
         ajax.body = JSON.stringify(data);
         ajax.go(); // call the API
       }
-      d.$.check.querySelector('span').innerHTML = "Check"
     }
 
     // Claim account on server
@@ -323,6 +322,7 @@
     }
 
     function hideCheckSpinner() {
+      d.$.check.querySelector('span').innerHTML = "Check"
       d.$.checkSpinner.hidden = true;
     }
 
