@@ -80,24 +80,25 @@
     <core-overlay id="webidhelp" backdrop="true">
       <h2>What is a WebID?</h2>
       <div>
-        <p>A Web ID is a URL for you. It allows you to set up a public profile,
+        <p>A WebID is a URL for you. It allows you to set up a public profile,
         with friends, pictures and all kinds of things.</p>
 
         <p>It works like having an account on a social networking site, but it
         isn't restricted to just that site. It is very open because the information
         can connect to other people, organizations and projects and so on, without
         everyon having to join the same social networking site. All you need is
-        some place on the web where you can save a file to.
-        (<a href="http://www.w3.org/wiki/WebID" target="blank">More information</a>)
+        some place on the web where you can save a file to, and that is what storage
+        gives you. (<a href="http://www.w3.org/wiki/WebID" target="blank">More 
+        information</a>)
         </p>
       </div>
       <h2>What is storage?</h2>
       <div>
         <p>When you create a new account, you may also get storage space on the
           selected server. The amount of available space can vary from server to
-          server. Additionally, a common list of workspaces (i.e. folders) maye be
-          created by default, such as <i>Public</i>, <i>Private</i>, <i>Family</i>,
-          <i>Work</i>, etc.</p>
+          server. Additionally, a common list of workspaces (i.e. dedicated folders) 
+          maye be created by default, such as <i>Public</i>, <i>Private</i>, 
+          <i>Family</i>, <i>Work</i>, etc.</p>
       </div>
       <paper-button raised="" core-overlay-toggle aria-label="Close help overlay">Close</paper-button>
     </core-overlay>
@@ -188,6 +189,7 @@
     });
 
     d.updateUsername = function(e) {
+      d.$.username.style.color = '#000';
       validateEmptyUser();
     }
 
