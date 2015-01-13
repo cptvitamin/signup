@@ -154,9 +154,6 @@
   <!-- JAVASCRIPT -->
 
   <script>
-    var formAction = "https://rww.io/api/spkac";
-    var d = document.querySelector("webid-signup");
-
     Polymer({
       ajaxResponse: function(e, r) {
         console.log("Checking account name: "+r.response.response.accountName);
@@ -176,29 +173,31 @@
         hideCheckSpinner();
       },
       toggleWebID: function() {
-        if (d.$.haveWebID.checked === true) {
-          d.$.fullname.hidden = true;
-          d.$.email.hidden = true;
-          d.$.img.hidden = true;
+        if (this.$.haveWebID.checked === true) {
+          this.$.fullname.hidden = true;
+          this.$.email.hidden = true;
+          this.$.img.hidden = true;
         } else {
-          d.$.fullname.hidden = false;
-          d.$.email.hidden = false;
-          d.$.img.hidden = false;
+          this.$.fullname.hidden = false;
+          this.$.email.hidden = false;
+          this.$.img.hidden = false;
         }
       }
     });
 
-    d.updateUsername = function(e) {
+    document.querySelector("webid-signup").updateUsername = function(e) {
+      var d = document.querySelector("webid-signup");
       d.$.username.style.color = '#000';
       validateEmptyUser();
     }
 
-    d.updateName = function(e) {
+    document.querySelector("webid-signup").updateName = function(e) {
       validateEmptyName();
     }
 
     // Check if the account is available
     function validateNew() {
+      var d = document.querySelector("webid-signup");
       d.$.check.querySelector('span').innerHTML = "Checking...";
       showCheckSpinner();
 
@@ -223,6 +222,9 @@
 
     // Claim account on server
     function createNew() {
+      var formAction = "https://rww.io/api/spkac";
+      var d = document.querySelector("webid-signup");
+
       showCreateSpinner();
       d.$.create.querySelector('span').innerHTML = "Creating...";
 
@@ -250,25 +252,28 @@
     }
 
     function iframeLoaded() {
-        d.$.form.hidden = true;
+      var d = document.querySelector("webid-signup");
+      d.$.form.hidden = true;
 
-        var url = "https://"+d.$.username.querySelector('input').value+".rww.io/";
-        d.$.accountUrl.href = url;
-        d.$.accountUrl.innerHTML = url;
+      var url = "https://"+d.$.username.querySelector('input').value+".rww.io/";
+      d.$.accountUrl.href = url;
+      d.$.accountUrl.innerHTML = url;
 
-        d.$.okDialog.hidden = false;
-        if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
-          d.$.okAccount.hidden = false;
-        }
+      d.$.okDialog.hidden = false;
+      if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
+        d.$.okAccount.hidden = false;
+      }
     }
 
     function setFormToken() {
+      var d = document.querySelector("webid-signup");
       var webidToken = new Date().getTime();
       d.$.webidToken.value = webidToken;
       return webidToken;
     }
 
     function validateEmptyUser() {
+      var d = document.querySelector("webid-signup");
       d.$.check.hidden = false;
       d.$.create.hidden = true;
       var user = d.$.username;
@@ -290,6 +295,7 @@
     }
 
     function validateEmptyName() {
+      var d = document.querySelector("webid-signup");
       var name = d.$.fullname;
       if (name) {
         if (name.querySelector('input').validity.valid) {
@@ -311,6 +317,7 @@
     }
 
     function clearAll() {
+      var d = document.querySelector("webid-signup");
       d.$.username.querySelector('input').value = "";
       d.$.fullname.querySelector('input').value = "";
       d.$.email.querySelector('input').value = "";
@@ -318,23 +325,28 @@
     }
 
     function showCheckSpinner() {
+      var d = document.querySelector("webid-signup");
       d.$.checkSpinner.hidden = false;
     }
 
     function hideCheckSpinner() {
+      var d = document.querySelector("webid-signup");
       d.$.check.querySelector('span').innerHTML = "Check"
       d.$.checkSpinner.hidden = true;
     }
 
     function showCreateSpinner() {
+      var d = document.querySelector("webid-signup");
       d.$.createSpinner.hidden = false;
     }
 
     function hideCreateSpinner() {
+      var d = document.querySelector("webid-signup");
       d.$.createSpinner.hidden = true;
     }
 
     function webidHelp() {
+      var d = document.querySelector("webid-signup");
       var h = d.$.webidhelp.toggle();
     }
   </script>

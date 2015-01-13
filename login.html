@@ -1,6 +1,10 @@
 <link rel="import" href="/bower_components/polymer/polymer.html">
 <link rel="import" href="/bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="/bower_components/paper-button/paper-button.html">
+<link rel="import" href="/bower_components/core-overlay/core-overlay.html">
+<link rel="import" href="/bower_components/core-icon-button/core-icon-button.html">
+<link rel="import" href="/bower_components/core-label/core-label.html">
+<link rel="import" href="/bower_components/core-transition/core-transition.html">
 
 <polymer-element name="webid-login">
   <template>
@@ -13,6 +17,15 @@
       width: 100%;
       font-size: 1.2rem;
       font-weight: 300;
+    }
+    core-icon-button {
+      color: #3e50b4;
+    }
+    core-overlay {
+      background: #fff;
+      padding: 30px 42px;
+      margin: 40px;
+      overflow: auto;
     }
     .login-header {
       margin-bottom: 10px;
@@ -34,18 +47,39 @@
     }
     </style>
 
-    <div id="loginHeader" layout horizontal center-justified>
+    <core-label id="loginHeader" layout horizontal center-justified>
       <content select="h2"><h2>Login with your WebID</h2></content>
-    </div>
+      <core-icon-button id="webidQuestion" icon="help" onclick="webidInfo()" alt="Tell me more about WebID."></core-icon-button>
+    </core-label>
     <content></content>
     <core-ajax id="ajaxLogin" url="https://rww.io/" on-core-response="{{ajaxLoginResponse}}" on-core-complete="{{ajaxLoginDone}}"></core-ajax>
     <div horizontal center-justified layout>
       <paper-button id="loginButton" raised="" class="colored" role="button" tabindex="0" onclick="doLogin()" center>Authenticate</paper-button>
     </div>
+
+    <!-- HELP OVERLAYS -->
+    <core-overlay id="webidinfo" backdrop="true">
+      <h2>What is a WebID?</h2>
+      <div>
+        <p>A WebID is a URL for you. It allows you to set up a public profile,
+        with friends, pictures and all kinds of things.</p>
+
+        <p>It works like having an account on a social networking site, but it
+        isn't restricted to just that site. It is very open because the information
+        can connect to other people, organizations and projects and so on, without
+        everyon having to join the same social networking site. All you need is
+        some place on the web where you can save a file to, and that is what storage
+        gives you. (<a href="http://www.w3.org/wiki/WebID" target="blank">More 
+        information</a>)</p>
+
+        <p>If you do not have a WebID yet, you can easily sign up for one by clicking 
+        the <strong>Signup</strong> button.</p>
+      </div>
+      <paper-button raised="" core-overlay-toggle aria-label="Close help overlay">Close</paper-button>
+    </core-overlay>
+
   </template>
   <script>
-
-  var l = document.querySelector("webid-login");
 
   Polymer({
     ajaxLoginResponse: function(e, r) {
@@ -54,7 +88,8 @@
       var user = r.xhr.getResponseHeader('User'); // look for User: header
       console.log('User: '+user);
       if (user) {
-        l.$.loginHeader.querySelector('h2').innerHTML = 'Authenticated WebID: <span class="greencolor">'+user+'</span>';
+        this.$.loginHeader.querySelector('h2').innerHTML = 'Authenticated WebID: <span class="greencolor">'+user+'</span>';
+        this.$.webidQuestion.hidden = true;
         if (getParam('ref').length > 0) {
           parent.postMessage('User:'+user,getParam('ref')); // pass WebID to the parent window
         }
@@ -62,35 +97,19 @@
     },
     ajaxLoginDone: function() {
       console.log("Done!");
-      l.$.loginButton.innerHTML = "Authenticated !";
+      this.$.loginButton.innerHTML = "Authenticate";
     }
   });
 
   doLogin = function() {
+    var l = document.querySelector("webid-login");
     l.$.loginButton.innerHTML = "Authenticating..."
 
     var ajax = l.$.ajaxLogin;
     ajax.method = 'HEAD';
-    ajax.headers='{"Accept": "*/*"}';
+    ajax.headers = '{"Accept": "*/*"}';
+    ajax.withCredentials = true;
     ajax.go(); // call the API
-
-    /*
-    $http({
-          url: "https://rww.io/",
-          method: "HEAD",
-          withCredentials: true, // This seems to break WebID-TLS login (using random certs)
-      }).success(function(data, status, headers, config) {
-          var user = headers('User'); // look for User: header
-          if (user && $scope.getParam('ref'))
-              parent.postMessage('User:'+headers('User'),$scope.getParam('ref')); // pass WebID to the parent window
-      }).error(function(data, status, headers, config) {
-          var user = headers('User');
-          if (user && $scope.getParam('ref'))
-              parent.postMessage('User:'+headers('User'),$scope.getParam('ref'));
-      });
-      if ($scope.getParam('ref'))
-          parent.postMessage('Close',$scope.getParam('ref')); // signal to close the modal
-      */
   }
 
   getParam = function(name) {
@@ -104,6 +123,12 @@
       return results[1];
     }
   }
+
+  function webidInfo() {
+    var l = document.querySelector("webid-login");
+    var h = l.$.webidinfo.toggle();
+  }
+
 
   </script>
 </polymer-element>
