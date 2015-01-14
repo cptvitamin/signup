@@ -89,21 +89,17 @@
 
   Polymer({
     ajaxLoginResponse: function(e, r) {
-      console.log(r.xhr);
-
       var user = r.xhr.getResponseHeader('User'); // look for User: header
-      console.log('User: '+user);
       if (user) {
         this.$.loginHeader.hidden = false;
         this.$.loginHeader.querySelector('h2').innerHTML = 'Authenticated WebID: <span class="greencolor">'+user+'</span>';
-        this.$.webidQuestion.hidden = true;
         if (getParam('ref').length > 0) {
-          parent.postMessage('User:'+user,getParam('ref')); // pass WebID to the parent window
+          parent.postMessage('User:'+user, getParam('ref')); // pass WebID to the parent window
+          parent.postMessage('Close', getParam('ref')); // signal to close the modal
         }
       }
     },
     ajaxLoginDone: function() {
-      console.log("Done!");
       this.$.loginButton.innerHTML = "Authenticate with WebID";
     }
   });
