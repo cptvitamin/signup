@@ -84,6 +84,7 @@
 
 
   <script>
+    console.log("Starting");
     var tabs = document.querySelector('paper-tabs');
 
     tabs.addEventListener('core-select', function() {
@@ -94,6 +95,10 @@
         document.querySelector('webid-login').hidden = true;
         document.querySelector('webid-signup').hidden = false;
       }
+    });
+
+    window.addEventListener('WebComponentsReady', function(e) {
+        console.log("Done importing!");
     });
   </script>
 </body>
