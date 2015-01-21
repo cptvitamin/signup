@@ -18,7 +18,7 @@ $ bower install
 Individual Components
 ---------------------
 
-If you would like to only use a particular component (i.e. login or signup), then you only need to include the minified version of the webcomponents script together with the corresponding component code, and then use the html tag in your page. For example, let's say you only want to use the signup component:
+If you would like to only use a particular component (i.e. login or signup), then you only need to include the minified version of the webcomponents script together with the corresponding component code, and then use the html tag in your page. For example, let's say you only want to use the signup component (replace with the actual version of the webcomponents.js script):
 
 ```
 <html>
@@ -47,7 +47,7 @@ WebIDAuth : { details: {
 ```
 
 
-To listen to the event, one can add a very simple event listener in the document that uses the login component:
+To listen to the event, one can add a very simple event listener in the document that uses the login component (replace  with the actual version of the webcomponents.js script):
 
 ```
 <html>
