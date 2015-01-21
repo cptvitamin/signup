@@ -7,6 +7,7 @@
   ],
   "description": "Login/Signup widget for WebID accounts",
   "license": "MIT",
+  "keywords": "webid, polymer, web-components",
   "private": false,
   "ignore": [
     "**/.*",
