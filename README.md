@@ -30,3 +30,4 @@ If you would like to only use a particular component (i.e. login or signup), the
 	<webid-login></webid-login>
 </body>
 </html>
+```
