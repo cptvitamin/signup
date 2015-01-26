@@ -18,12 +18,12 @@ $ bower install
 Individual Components
 ---------------------
 
-If you would like to only use a particular component (i.e. login or signup), then you only need to include the minified version of the webcomponents script together with the corresponding component code, and then use the html tag in your page. For example, let's say you only want to use the signup component (replace with the actual version of the webcomponents.js script):
+If you would like to only use a particular component (i.e. login or signup), then you only need to include the minified version of the webcomponents script together with the corresponding component code, and then use the html tag in your page. For example, let's say you only want to use the signup component (replace with the actual version of the webcomponents.js script, e.g. 0.5.2):
 
 ```
 <html>
 <head>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/polymer/<version>/webcomponents.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/<version>/webcomponents.min.js"></script>
 	<link rel="import" href="signup.html">
 </head>
 <body>
@@ -47,12 +47,12 @@ WebIDAuth : { details: {
 ```
 
 
-To listen to the event, one can add a very simple event listener in the document that uses the login component (replace  with the actual version of the webcomponents.js script):
+To listen to the event, one can add a very simple event listener in the document that uses the login component (replace with the actual version of the webcomponents.js script, e.g. 0.5.2):
 
 ```
 <html>
 <head>
-	<script src="//cdnjs.cloudflare.com/ajax/libs/polymer/<version>/webcomponents.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/<version>/webcomponents.min.js"></script>
 	<link rel="import" href="login.html">
 </head>
 <body>
