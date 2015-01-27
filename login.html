@@ -106,14 +106,18 @@
           // Auth failed
           this.$.loginHeader.querySelector('h2').innerHTML = 'Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="blank">debugger</a> to find the cause.';
         }
-        // create and send event to parent window (also to escape shadowDOM)
-        var evt = new CustomEvent("WebIDAuth", {"detail": authData});
-        parent.window.dispatchEvent(evt);
 
         // legacy postMessage way
         if (getParam('ref').length > 0) {
           parent.postMessage('User:'+user, getParam('ref')); // pass WebID to the parent window
           parent.postMessage('Close', getParam('ref')); // signal to close the modal
+        }
+        // create and send event to parent window (also to escape shadowDOM)
+        try {
+          var evt = new CustomEvent("WebIDAuth", {"detail": authData});
+          parent.window.dispatchEvent(evt);
+        } catch (e) {
+          // silent drop for dispatchEvent errors due to CORS
         }
       }
     },
