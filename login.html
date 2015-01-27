@@ -116,6 +116,8 @@
         try {
           var evt = new CustomEvent("WebIDAuth", {"detail": authData});
           parent.window.dispatchEvent(evt);
+        } catch (e) {
+          console.log(e);
         }
       }
     },
