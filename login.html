@@ -107,7 +107,6 @@
           // Auth failed
           this.$.loginHeader.querySelector('h2').innerHTML = 'Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="blank">debugger</a> to find the cause.';
         }
-
         // legacy postMessage way
         if (getParam('ref').length > 0) {
           parent.postMessage('User:'+user, getParam('ref')); // pass WebID to the parent window
