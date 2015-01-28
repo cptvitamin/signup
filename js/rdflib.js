@@ -1869,11 +1869,7 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
                     frame.addArc(RDFParser.ns.RDF + 'value');
                     frame = this.buildFrame(frame);
                 }
-<<<<<<< HEAD
-                frame.addLiteral(dom.value);
-=======
                 frame.addLiteral(dom.nodeValue);
->>>>>>> master
             }
             else if (elementURI(dom)!== RDFParser.ns.RDF + "RDF"){
                   // not root
@@ -1892,21 +1888,13 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
                            " Halting. Only one of these" + " properties may be specified on a" + " node.");
                     }
                     if (!about && rdfid){
-<<<<<<< HEAD
-                        frame.addNode("#" + rdfid.value);
-=======
                         frame.addNode("#" + rdfid.nodeValue);
->>>>>>> master
                         dom.removeAttributeNode(rdfid);
                     }
                     else if (about == null && rdfid == null){
                         var bnid = this.getAttributeNodeNS(dom, RDFParser.ns.RDF, "nodeID");
                         if (bnid){
-<<<<<<< HEAD
-                            frame.addBNode(bnid.value);
-=======
                             frame.addBNode(bnid.nodeValue);
->>>>>>> master
                             dom.removeAttributeNode(bnid);
                         }
                         else {
@@ -1914,27 +1902,16 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
                         }
                     }
                     else {
-<<<<<<< HEAD
-                        frame.addNode(about.value);
-=======
                         frame.addNode(about.nodeValue);
->>>>>>> master
                         dom.removeAttributeNode(about);
                     }
                     // Typed nodes
                     var rdftype = this.getAttributeNodeNS(dom, RDFParser.ns.RDF, "type");
                     if (RDFParser.ns.RDF + "Description" !== elementURI(dom)){
-<<<<<<< HEAD
-                        rdftype = {'value': elementURI(dom)};
-                    }
-                    if (rdftype != null){
-                        this.store.add(frame.node, this.store.sym(RDFParser.ns.RDF + "type"), this.store.sym($rdf.Util.uri.join(rdftype.value, 
-=======
                         rdftype = {'nodeValue': elementURI(dom)};
                     }
                     if (rdftype != null){
                         this.store.add(frame.node, this.store.sym(RDFParser.ns.RDF + "type"), this.store.sym($rdf.Util.uri.join(rdftype.nodeValue, 
->>>>>>> master
                            frame.base)), this.why);
                         if (rdftype.nodeName){
                             dom.removeAttributeNode(rdftype);
@@ -1942,11 +1919,7 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
                     }
                     // Property Attributes
                     for (var x = attrs.length - 1;x >= 0;x--){
-<<<<<<< HEAD
-                        this.store.add(frame.node, this.store.sym(elementURI(attrs[x])), this.store.literal(attrs[x].value, 
-=======
                         this.store.add(frame.node, this.store.sym(elementURI(attrs[x])), this.store.literal(attrs[x].nodeValue, 
->>>>>>> master
                            frame.lang), this.why);
                     }
                 }
@@ -1956,30 +1929,18 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
                     if (this.reify){
                         rdfid = this.getAttributeNodeNS(dom, RDFParser.ns.RDF, "ID");
                         if (rdfid){
-<<<<<<< HEAD
-                            frame.rdfid = rdfid.value;
-=======
                             frame.rdfid = rdfid.nodeValue;
->>>>>>> master
                             dom.removeAttributeNode(rdfid);
                         }
                     }
                     var parsetype = this.getAttributeNodeNS(dom, RDFParser.ns.RDF, "parseType");
                     var datatype = this.getAttributeNodeNS(dom, RDFParser.ns.RDF, "datatype");
                     if (datatype){
-<<<<<<< HEAD
-                        frame.datatype = datatype.value;
-                        dom.removeAttributeNode(datatype);
-                    }
-                    if (parsetype){
-                        var nv = parsetype.value;
-=======
                         frame.datatype = datatype.nodeValue;
                         dom.removeAttributeNode(datatype);
                     }
                     if (parsetype){
                         var nv = parsetype.nodeValue;
->>>>>>> master
                         if (nv === "Literal"){
                             frame.datatype = RDFParser.ns.RDF + "XMLLiteral";// (this.buildFrame(frame)).addLiteral(dom)
                                // should work but doesn't
@@ -2004,20 +1965,12 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
                         var bnid2 = this.getAttributeNodeNS(dom, RDFParser.ns.RDF, "nodeID");
                         frame = this.buildFrame(frame);
                         if (resource){
-<<<<<<< HEAD
-                            frame.addNode(resource.value);
-=======
                             frame.addNode(resource.nodeValue);
->>>>>>> master
                             dom.removeAttributeNode(resource);
                         }
                         else {
                             if (bnid2){
-<<<<<<< HEAD
-                                frame.addBNode(bnid2.value);
-=======
                                 frame.addBNode(bnid2.nodeValue);
->>>>>>> master
                                 dom.removeAttributeNode(bnid2);
                             }
                             else {
@@ -2028,17 +1981,10 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
                             var f = this.buildFrame(frame);
                             f.addArc(elementURI(attrs[x1]));
                             if (elementURI(attrs[x1])=== RDFParser.ns.RDF + "type"){
-<<<<<<< HEAD
-                                (this.buildFrame(f)).addNode(attrs[x1].value);
-                            }
-                            else {
-                                (this.buildFrame(f)).addLiteral(attrs[x1].value);
-=======
                                 (this.buildFrame(f)).addNode(attrs[x1].nodeValue);
                             }
                             else {
                                 (this.buildFrame(f)).addLiteral(attrs[x1].nodeValue);
->>>>>>> master
                             }
                         }
                     }
@@ -2108,31 +2054,19 @@ if ((typeof module !== "undefined" && module !== null ? module.exports : void 0)
         var attrs = element.attributes;
         var base = element.getAttributeNode("xml:base");
         if (base != null){
-<<<<<<< HEAD
-            frame.base = base.value;
-=======
             frame.base = base.nodeValue;
->>>>>>> master
             element.removeAttribute("xml:base");
         }
         var lang = element.getAttributeNode("xml:lang");
         if (lang != null){
-<<<<<<< HEAD
-            frame.lang = lang.value;
-=======
             frame.lang = lang.nodeValue;
->>>>>>> master
             element.removeAttribute("xml:lang");
         }
         // remove all extraneous xml and xmlns attributes
         for (var x = attrs.length - 1;x >= 0;x--){
             if (attrs[x].nodeName.substr(0, 3) === "xml"){
                 if (attrs[x].name.slice(0, 6) === 'xmlns:'){
-<<<<<<< HEAD
-                    var uri = attrs[x].value;// alert('base for namespac attr:'+this.base);
-=======
                     var uri = attrs[x].nodeValue;// alert('base for namespac attr:'+this.base);
->>>>>>> master
                     if (this.base) uri = $rdf.Util.uri.join(uri, this.base);
                     this.store.setPrefixForURI(attrs[x].name.slice(6), uri);
                 }
@@ -5675,25 +5609,15 @@ $rdf.SPARQLResultsInterpreter = function (xml, callback, doneCallback)
 	
 	function xmlMakeTerm(node)
 	{
-<<<<<<< HEAD
-		//alert("xml Node name: "+node.nodeName+"\nxml Child value: "+node.childNodes[0].value);
-=======
 		//alert("xml Node name: "+node.nodeName+"\nxml Child value: "+node.childNodes[0].nodeValue);
->>>>>>> master
 		var val=node.childNodes[0]
 		for (var x=0; x<node.childNodes.length;x++)
 			if (node.childNodes[x].nodeType==3) { val=node.childNodes[x]; break; }
 		
 		if (handleP(node.nodeName) == spns+"uri") 
-<<<<<<< HEAD
-			return kb.sym(val.value);
-		else if (handleP(node.nodeName) == spns+"literal")
-			return kb.literal(val.value);
-=======
 			return kb.sym(val.nodeValue);
 		else if (handleP(node.nodeName) == spns+"literal")
 			return kb.literal(val.nodeValue);
->>>>>>> master
 		else if (handleP(node.nodeName) == spns+"unbound")
 			return 'unbound'
 		
@@ -5737,11 +5661,7 @@ $rdf.SPARQLResultsInterpreter = function (xml, callback, doneCallback)
 		
 	for (var x=0;x<sparql.childNodes.length;x++) //looks for the head and results childNodes
 	{
-<<<<<<< HEAD
-		$rdf.log.info("Type: "+sparql.childNodes[x].nodeType+"\nName: "+sparql.childNodes[x].nodeName+"\nValue: "+sparql.childNodes[x].value);
-=======
 		$rdf.log.info("Type: "+sparql.childNodes[x].nodeType+"\nName: "+sparql.childNodes[x].nodeName+"\nValue: "+sparql.childNodes[x].nodeValue);
->>>>>>> master
 		
 		if (sparql.childNodes[x].nodeType==1 && handleP(sparql.childNodes[x].nodeName)== spns+"head")
 			head = sparql.childNodes[x];
