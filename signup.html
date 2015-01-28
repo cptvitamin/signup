@@ -120,7 +120,7 @@
         </p>
       </div>
       <div id="finish">
-        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate <em>twice</em>.</p>
+        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate <em>twice</em>. Your new certificate should have the following name: <em><span id="certname"></span></em>.</p>
         <p><span class="warning">Attention:</span> do not proceed unless your certificate was installed successfully.
         </p>
         <div id="profilestatus"></div>
@@ -283,6 +283,8 @@
     function iframeLoaded() {
       var d = document.querySelector("webid-signup");
       d.$.form.hidden = true;
+
+      d.$.certname.innerHTML = d.$.fullname.querySelector('input').value;
 
       var url = "https://"+d.$.username.querySelector('input').value+".rww.io/";
       d.$.accountUrl.innerHTML = '<a href="'+url+'" target="_blank">'+url+'</a>';
