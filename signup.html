@@ -1,4 +1,5 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
+<link rel="import" href="bower_components/font-roboto/roboto.html">
 <link rel="import" href="bower_components/core-icon-button/core-icon-button.html">
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-input/paper-input-decorator.html">
@@ -8,6 +9,9 @@
 <link rel="import" href="bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="bower_components/core-overlay/core-overlay.html">
 <link rel="import" href="bower_components/core-transition/core-transition.html">
+
+<script src="js/rdflib.js"></script>
+<script src="js/signup.js"></script>
 
 <polymer-element name="webid-signup">
   <template>
@@ -68,6 +72,8 @@
 
     <core-ajax id="ajax" url="https://rww.io/api/accountStatus" on-core-response="{{ajaxResponse}}" on-core-complete="{{ajaxDone}}"></core-ajax>
 
+    <core-ajax id="ajaxLogin" url="https://rww.io/" on-core-response="{{ajaxLogin}}"></core-ajax>
+
     <!-- SIGNUP HEADER -->
 
     <core-label id="signup-header" layout horizontal center>
@@ -87,7 +93,7 @@
         can connect to other people, organizations and projects and so on, without
         everyon having to join the same social networking site. All you need is
         some place on the web where you can save a file to, and that is what storage
-        gives you. (<a href="http://www.w3.org/wiki/WebID" target="blank">More 
+        gives you. (<a href="http://www.w3.org/wiki/WebID" target="_blank">More 
         information</a>)
         </p>
       </div>
@@ -110,11 +116,16 @@
           Your WebID was created successfully!
         </p>
       </div>
-      <div id="storage">
-        <p>Your storage space was created. You can view it by visiting this URL:<br/>
-          <small>(please wait for the certificate to be installed before clicking)</small><br/>
-          <a id="accountUrl" href="" target="blank"></a>
-
+      <div id="finish">
+        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate <em>twice</em> so please remember to wait for the certificate to be installed before clicking.
+        </p>
+        <div id="profilestatus"></div>
+        <paper-button id="finishlogin" raised="" role="button" class="greencolored" tabindex="0" center onclick="finishLogin()">Finish</paper-button>
+      </div>
+      <div id="alldone" hidden>
+        <h2 class="greencolor">Storage account created!</h2>
+        <p>You can view it by visiting this URL:<br/>
+          <span id="accountUrl"></span>
         </p>
       </div>
     </div>
@@ -172,6 +183,19 @@
       ajaxDone: function() {
         console.log("Done!");
         hideCheckSpinner();
+      },
+      ajaxLogin: function(e, r) {
+        var user = r.xhr.getResponseHeader('User'); // look for User: header
+        if (user) {
+          // auth object
+          if (user.substr(0, 4) === 'http') {
+            appendElement(this.$.profilestatus, '<p>Authenticating with your WebID...<core-icon icon="done" class="greencolor"></core-icon></p>');
+            finishAccount(user, this.$.username.querySelector('input').value+".rww.io/");
+          } else {
+            // Auth failed
+            appendElement(this.$.profilestatus, '<p>Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="_blank">debugger</a> to find the cause.</p>');
+          }
+        }
       },
       toggleWebID: function() {
         if (this.$.haveWebID.checked === true) {
@@ -257,8 +281,7 @@
       d.$.form.hidden = true;
 
       var url = "https://"+d.$.username.querySelector('input').value+".rww.io/";
-      d.$.accountUrl.href = url;
-      d.$.accountUrl.innerHTML = url;
+      d.$.accountUrl.innerHTML = '<a href="'+url+'" target="_blank">'+url+'</a>';
 
       d.$.okDialog.hidden = false;
       if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
@@ -323,6 +346,19 @@
       d.$.fullname.querySelector('input').value = "";
       d.$.email.querySelector('input').value = "";
       d.$.img.querySelector('input').value = "";
+    }
+
+    function finishLogin() {
+      var d = document.querySelector("webid-signup");
+      var ajax = d.$.ajaxLogin;
+      ajax.method = 'HEAD';
+      ajax.headers = '{"Accept": "*/*"}';
+      ajax.withCredentials = true;
+      ajax.go(); // call the API
+    };
+
+    function appendElement(elem, html) {
+      elem.insertAdjacentHTML('beforeend', html);
     }
 
     function showCheckSpinner() {
