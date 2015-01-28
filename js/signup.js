@@ -37,9 +37,8 @@ Object.observe(wsCount, function(changes) {
 function finishAccount(webid, account) {
   var d = document.querySelector("webid-signup");
   d.$.finishlogin.hidden = true;
-
-  // TODO: remove override
-  account = "https://zomg.rww.io/";
+  // set proper scheme for account
+  account = (webid.substr(0, 5) === 'https')?'https://'+account:'http://'+account;
 
   wsCount.webid = webid;
   wsCount.account = account;
