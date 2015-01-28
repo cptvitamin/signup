@@ -51,6 +51,9 @@
     .greencolor {
       color: #66BB6A;
     }
+    .warning {
+      color: red;
+    }
     polyfill-next-selector { content: '.signup-header h2'; }
     #signup-header ::content h2 {
         margin: 0;
@@ -117,7 +120,8 @@
         </p>
       </div>
       <div id="finish">
-        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate <em>twice</em> so please remember to wait for the certificate to be installed before clicking.
+        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate <em>twice</em>.</p>
+        <p><span class="warning">Attention:</span> do not proceed unless your certificate was installed successfully.
         </p>
         <div id="profilestatus"></div>
         <paper-button id="finishlogin" raised="" role="button" class="greencolored" tabindex="0" center onclick="finishLogin()">Finish</paper-button>
