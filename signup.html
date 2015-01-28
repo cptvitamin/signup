@@ -93,7 +93,7 @@
         can connect to other people, organizations and projects and so on, without
         everyon having to join the same social networking site. All you need is
         some place on the web where you can save a file to, and that is what storage
-        gives you. (<a href="http://www.w3.org/wiki/WebID" target="blank">More 
+        gives you. (<a href="http://www.w3.org/wiki/WebID" target="_blank">More 
         information</a>)
         </p>
       </div>
@@ -117,16 +117,15 @@
         </p>
       </div>
       <div id="finish">
-        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate so please remember to wait for the certificate to be installed before clicking.
+        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate <em>twice</em> so please remember to wait for the certificate to be installed before clicking.
         </p>
         <div id="profilestatus"></div>
         <paper-button id="finishlogin" raised="" role="button" class="greencolored" tabindex="0" center onclick="finishLogin()">Finish</paper-button>
       </div>
-      <div id="done" hidden>
-        <p>Your storage space was created. You can view it by visiting this URL:<br/>
-          <small>(please wait for the certificate to be installed before clicking)</small><br/>
+      <div id="alldone" hidden>
+        <h2 class="greencolor">Storage account created!</h2>
+        <p>You can view it by visiting this URL:<br/>
           <span id="accountUrl"></span>
-
         </p>
       </div>
     </div>
@@ -191,10 +190,10 @@
           // auth object
           if (user.substr(0, 4) === 'http') {
             appendElement(this.$.profilestatus, '<p>Authenticating with your WebID...<core-icon icon="done" class="greencolor"></core-icon></p>');
-            finishAccount(user, this.$.accountUrl.innerHTML, this.$.profilestatus);
+            finishAccount(user, this.$.username.querySelector('input').value+".rww.io/");
           } else {
             // Auth failed
-            appendElement(this.$.profilestatus, '<p>Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="blank">debugger</a> to find the cause.</p>');
+            appendElement(this.$.profilestatus, '<p>Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="_blank">debugger</a> to find the cause.</p>');
           }
         }
       },
@@ -282,7 +281,7 @@
       d.$.form.hidden = true;
 
       var url = "https://"+d.$.username.querySelector('input').value+".rww.io/";
-      d.$.accountUrl.innerHTML = url;
+      d.$.accountUrl.innerHTML = '<a href="'+url+'" target="_blank">'+url+'</a>';
 
       d.$.okDialog.hidden = false;
       if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
@@ -350,7 +349,6 @@
     }
 
     function finishLogin() {
-      console.log('Finishing...');
       var d = document.querySelector("webid-signup");
       var ajax = d.$.ajaxLogin;
       ajax.method = 'HEAD';
