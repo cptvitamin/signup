@@ -1,5 +1,5 @@
-Signup
-=======
+WebID Login/Signup
+==================
 
 WebID login/singup application.
 
@@ -32,8 +32,8 @@ If you would like to only use a particular component (i.e. login or signup), the
 </html>
 ```
 
-Listening for authentication events
------------------------------------
+Login
+=====
 
 The login component currently authenticates users through WebID-TLS. Once the authentication has been performed, a CustomEvent function is used to trigger and propagate the auth outcome to the parent window. Here is the structure of the *WebIDAuth* event object:
 
@@ -76,7 +76,7 @@ To listen to the event, one can add a very simple event listener in the document
 Signup
 ======
 
-This is a guide describing what must implemented on the server to make it compatible with the signup component. The only assumption is that servers willing to provide new accounts are already [Linked Data Platform 1.0](http://www.w3.org/TR/ldp/) compliant, and of course, [WebID](www.w3.org/2005/Incubator/webid/spec/identity/) and [WebID-TLS](http://www.w3.org/2005/Incubator/webid/spec/tls) compliant.
+Some support must implemented on the server to make it compatible with the signup component. The only assumption is that servers willing to provide new accounts are already [Linked Data Platform 1.0](http://www.w3.org/TR/ldp/) compliant, and of course, [WebID](www.w3.org/2005/Incubator/webid/spec/identity/) and [WebID-TLS](http://www.w3.org/2005/Incubator/webid/spec/tls) compliant.
 
 
 Client - server API
