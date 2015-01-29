@@ -1,5 +1,5 @@
-Signup
-=======
+WebID Login/Signup
+==================
 
 WebID login/singup application.
 
