@@ -174,6 +174,11 @@
       ajaxResponse: function(e, r) {
         console.log("Checking account name: "+r.response.response.accountName);
         console.log("Account available: "+r.response.response.available);
+        if (typeof r.response.formuri != undefined && r.response.formuri.length > 0) {
+          this.$.form.action = r.response.formuri;
+        } else {
+          //@@TODO
+        }
         if (r.response.response.available === true) {
           this.$.username.isInvalid = false;
           this.$.username.style.color = '#66BB6A';
@@ -251,7 +256,6 @@
 
     // Claim account on server
     function createNew() {
-      var formAction = "https://rww.io/api/spkac";
       var d = document.querySelector("webid-signup");
 
       showCreateSpinner();
@@ -271,7 +275,6 @@
         d.$.hiddenframe.attachEvent("onload", iframeLoaded);
       }
 
-      d.$.form.action = formAction;
       d.$.form.submit();
 
       var isFF = 'MozAppearance' in document.documentElement.style;
