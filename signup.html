@@ -139,7 +139,7 @@
         <core-label center horizontal layout id="webidcheckbox">
           <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID</span>
         </core-label>
-        <keygen id="spkacWebID" name="SPKAC" challenge="randomchars" keytype="rsa" hidden>
+        <keygen id="spkacWebID" name="spkac" challenge="randomchars" keytype="rsa" hidden>
       </div>
       <paper-input-decorator id="username" label="Preferred account name" floatinglabel="" error="Account name is required" layout="" vertical="">
         <input is="core-input" name="username" required="" on-input="{{updateUsername}}">
