@@ -35,12 +35,14 @@ function authWebID(account, dom) {
           if (user.substr(0, 4) === 'http') {
             if (dom) {
               appendElement(d.$.profilestatus, '<p>Authenticating with your WebID...<core-icon icon="done" class="greencolor"></core-icon></p>');
+              window.scrollTo(0,document.body.scrollHeight);
             }
             finishAccount(user, account, dom);
           } else {
             // Auth failed
             if (dom) {
               appendElement(d.$.profilestatus, '<p>Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="_blank">debugger</a> to find the cause.</p>');
+              window.scrollTo(0,document.body.scrollHeight);
             }
           }
         }
@@ -75,6 +77,7 @@ function finishAccount(webid, account, dom) {
         ws+'</em>...<core-icon id="done'+ws+
         '" icon="done" class="greencolor" hidden></core-icon></p><p id="acl'+
         ws+'" hidden>Setting ACLs for '+ws+'...<core-icon id="acldone'+ws+'" icon="done" class="greencolor"></core-icon></p>');
+      window.scrollTo(0,document.body.scrollHeight);
     }
     createWS(ws, wsCount, webid, account, dom);
   });
@@ -119,6 +122,7 @@ function createWS(ws, wsCount, webid, account, dom) {
         setACL(uri, aclURI, webid, ws, dom);
         if (dom) {
           d.$.profilestatus.querySelector('#done'+ws).hidden = false;
+          window.scrollTo(0,document.body.scrollHeight);
         }
         wsCount.counter++;
       } else {
@@ -172,6 +176,7 @@ function setACL(uri, aclURI, webid, ws, dom) {
       if (xhr.status == 200 || xhr.status == 201) {
         if (dom) {
           d.$.profilestatus.querySelector('#acldone'+ws).hidden = false;
+          window.scrollTo(0,document.body.scrollHeight);
         }
       } else {
         console.log("Could not write ACL "+aclURI+" | HTTP status: "+xhr.status);
@@ -209,6 +214,7 @@ function createPref(webid, account, dom) {
       if (xhr.status == 200 || xhr.status == 201) {
           if (dom) {
             d.$.profilestatus.querySelector('#prefdone').hidden = false;
+            window.scrollTo(0,document.body.scrollHeight);
           }
           updateProfile(webid, account+'Preferences/prefs', dom);
       } else {
@@ -257,6 +263,7 @@ function updateProfile(webid, prefURI, dom) {
             if (dom) {
               d.$.profilestatus.querySelector('#profdone').hidden = false;
               d.$.alldone.hidden = false;
+              window.scrollTo(0,document.body.scrollHeight);
             }
           } else {
             console.log("Could not write profile file "+docURI+" | HTTP status: "+xhr.status);
