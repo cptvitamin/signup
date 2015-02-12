@@ -20,28 +20,31 @@ function authWebID(account, dom) {
   if (dom) {
     var d = document.querySelector("webid-signup");
   }
+  if (account.lastIndexOf('/') < 0 || account.lastIndexOf('/') < account.length - 1) {
+    account = account + '/';
+  }
 
   var xhr = new XMLHttpRequest();
-  xhr.open("HEAD", "https://"+account, true);
+  xhr.open("HEAD", account, true);
   xhr.withCredentials = true;
   xhr.send();
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState == xhr.DONE) {
-      if (xhr.status == 200 || xhr.status == 201) {
+      if (xhr.status < 500) {
         user = xhr.getResponseHeader('User');
         if (user) {
           // auth object
           if (user.substr(0, 4) === 'http') {
             if (dom) {
-              appendElement(d.$.profilestatus, '<p>Authenticating with your WebID...<core-icon icon="done" class="greencolor"></core-icon></p>');
+              d.appendElement(d.$.profilestatus, '<p>Authenticating with your WebID...<core-icon icon="done" class="greencolor"></core-icon></p>');
               window.scrollTo(0,document.body.scrollHeight);
             }
             finishAccount(user, account, dom);
           } else {
             // Auth failed
             if (dom) {
-              appendElement(d.$.profilestatus, '<p>Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="_blank">debugger</a> to find the cause.</p>');
+              d.appendElement(d.$.profilestatus, '<p>Authentication failed. Try using the <a href="https://auth.my-profile.eu/auth/index.php?verbose=on" target="_blank">debugger</a> to find the cause.</p>');
               window.scrollTo(0,document.body.scrollHeight);
             }
           }
@@ -63,8 +66,6 @@ function finishAccount(webid, account, dom) {
     var d = document.querySelector("webid-signup");
     d.$.finishlogin.hidden = true;
   }
-  // set proper scheme for account
-  account = (webid.substr(0, 5) === 'https')?'https://'+account:'http://'+account;
 
   var wsCount = { counter: 0,
                   webid: webid,
@@ -73,7 +74,7 @@ function finishAccount(webid, account, dom) {
 
   workspaces.forEach(function(ws) {
     if (dom) {
-      appendElement(d.$.profilestatus, '<p id="'+ws+'" hidden>Creating default workspace: <em>'+
+      d.appendElement(d.$.profilestatus, '<p id="'+ws+'" hidden>Creating default workspace: <em>'+
         ws+'</em>...<core-icon id="done'+ws+
         '" icon="done" class="greencolor" hidden></core-icon></p><p id="acl'+
         ws+'" hidden>Setting ACLs for '+ws+'...<core-icon id="acldone'+ws+'" icon="done" class="greencolor"></core-icon></p>');
@@ -192,7 +193,7 @@ function setACL(uri, aclURI, webid, ws, dom) {
 function createPref(webid, account, dom) {
   if (dom) {
     var d = document.querySelector("webid-signup");
-    appendElement(d.$.profilestatus, '<p>Creating preferences file...<core-icon id="prefdone" icon="done" class="greencolor" hidden></core-icon></p>');
+    d.appendElement(d.$.profilestatus, '<p>Creating preferences file...<core-icon id="prefdone" icon="done" class="greencolor" hidden></core-icon></p>');
   }
 
   var g = new $rdf.graph();
@@ -231,7 +232,7 @@ function createPref(webid, account, dom) {
 function updateProfile(webid, prefURI, dom) {
   if (dom) {
     var d = document.querySelector("webid-signup");
-    appendElement(d.$.profilestatus, '<p>Updating WebID profile...<core-icon id="profdone" icon="done" class="greencolor" hidden></core-icon></p>');
+    d.appendElement(d.$.profilestatus, '<p>Updating WebID profile...<core-icon id="profdone" icon="done" class="greencolor" hidden></core-icon></p>');
   }
 
   var g = new $rdf.graph();

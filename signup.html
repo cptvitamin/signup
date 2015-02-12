@@ -4,11 +4,16 @@
 <link rel="import" href="bower_components/paper-button/paper-button.html">
 <link rel="import" href="bower_components/paper-input/paper-input-decorator.html">
 <link rel="import" href="bower_components/paper-spinner/paper-spinner.html">
-<link rel="import" href="bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="bower_components/paper-dropdown/paper-dropdown.html">
+<link rel="import" href="bower_components/paper-item/paper-item.html">
+<link rel="import" href="bower_components/core-menu/core-menu.html">
 <link rel="import" href="bower_components/core-label/core-label.html">
 <link rel="import" href="bower_components/core-ajax/core-ajax.html">
 <link rel="import" href="bower_components/core-overlay/core-overlay.html">
 <link rel="import" href="bower_components/core-transition/core-transition.html">
+<link rel="import" href="bower_components/flag-icon/flag-icon.html">
 
 <script src="js/rdflib.min.js"></script>
 <script src="js/signup.js"></script>
@@ -69,19 +74,23 @@
     #submit, #webidcheckbox {
       margin-top: 10px;
     }
+    paper-toggle-button {
+      margin-right: 10px;
+    }
+    paper-item {
+      min-width: 230px;
+    }
     </style>
 
     <!-- AJAX GOES HERE -->
 
-    <core-ajax id="ajax" url="https://rww.io/api/accountStatus" on-core-response="{{ajaxResponse}}" on-core-complete="{{ajaxDone}}"></core-ajax>
-
-    <core-ajax id="ajaxLogin" url="https://rww.io/" on-core-response="{{ajaxLogin}}"></core-ajax>
+    <core-ajax id="ajax" url="" on-core-response="{{ajaxResponse}}" on-core-complete="{{ajaxDone}}"></core-ajax>
 
     <!-- SIGNUP HEADER -->
 
     <core-label id="signup-header" layout horizontal center>
       <content select="h2"><h2>Signup for a WebID / Storage</h2></content>
-      <core-icon-button icon="help" onclick="webidHelp()" alt="Tell me more about WebID."></core-icon-button>
+      <core-icon-button icon="help" on-tap="{{webidHelp}}" alt="Tell me more about WebID."></core-icon-button>
     </core-label>
 
     <!-- HELP OVERLAYS -->
@@ -110,6 +119,13 @@
       </div>
       <paper-button raised="" core-overlay-toggle aria-label="Close help overlay">Close</paper-button>
     </core-overlay>
+    <core-overlay id="endpointshelp" backdrop="true">
+      <h2>What are servers?</h2>
+      <div>
+        <p>The servers in this list are used to generate your WebID, as well as to host your WebID profile. You should pick the one you like the best, or trust the most.</p>
+      </div>
+      <paper-button raised="" core-overlay-toggle aria-label="Close help overlay">Close</paper-button>
+    </core-overlay>
 
     <!-- FORM FIELDS -->
     <div id="okDialog" hidden>
@@ -124,7 +140,7 @@
         <p><span class="warning">Attention:</span> do not proceed unless your certificate was installed successfully.
         </p>
         <div id="profilestatus"></div>
-        <paper-button id="finishlogin" raised="" role="button" class="greencolored" tabindex="0" center onclick="prepareLogin()">Finish</paper-button>
+        <paper-button id="finishlogin" raised="" role="button" class="greencolored" tabindex="0" center on-tap="{{prepareLogin}}">Finish</paper-button>
       </div>
       <div id="alldone" hidden>
         <h2 class="greencolor">Storage account created!</h2>
@@ -134,10 +150,10 @@
       </div>
     </div>
 
-    <form id="form" method="post" target="spkac">
+    <form id="accountform" method="post" target="spkac">
       <div>
         <core-label center horizontal layout id="webidcheckbox">
-          <paper-checkbox id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-checkbox>I already have a WebID</span>
+          <paper-toggle-button id="haveWebID" class="blue" for="" role="checkbox" tabindex="0" aria-labelledby="webidcheckbox" on-tap="{{toggleWebID}}"></paper-toggle-button>I already have a WebID</span>
         </core-label>
         <keygen id="spkacWebID" name="spkac" challenge="randomchars" keytype="rsa" hidden>
       </div>
@@ -153,15 +169,28 @@
       <paper-input-decorator id="img" label="Picture URL (optional)" floatinglabel="" layout="" vertical="">
         <input is="core-input" name="img">
       </paper-input-decorator>
+      Server: 
+      <core-label center horizontal>
+        <paper-dropdown-menu label="List of available servers">
+          <paper-dropdown class="dropdown" layered>
+            <core-menu class="menu" selected="{{selectedEndpoint}}">
+              <template repeat="{{s in servers}}">
+                <paper-item id="{{s.url}}"><flag-icon key="{{s.flagISO}}" width="16"></flag-icon>&nbsp;{{s.name}}</paper-item>
+              </template>
+            </core-menu>
+          </paper-dropdown>
+        </paper-dropdown-menu>
+        <core-icon-button icon="help" on-tap="{{endpointHelp}}" alt="What is this server?"></core-icon-button>
+      </core-label>
 
       <div id="submit">
-        <paper-button id="check" raised="" class="bluecolored" role="button" tabindex="0" center onclick="validateNew()">
+        <paper-button id="check" raised="" class="bluecolored" role="button" tabindex="0" center on-tap="{{validateNew}}">
           <span>Check</span> <paper-spinner id="checkSpinner" active="true" class="white" alt="Checking availability" hidden></paper-spinner>
         </paper-button>
-        <paper-button id="create" raised="" class="greencolored" role="button" tabindex="0" center onclick="createNew()" hidden>
+        <paper-button id="create" raised="" class="greencolored" role="button" tabindex="0" center on-tap="{{createNew}}" hidden>
           <span>Create!</span> <paper-spinner id="createSpinner" active="true" class="white" alt="Creating account" hidden></paper-spinner>
         </paper-button>
-        <paper-button raised="" role="button" tabindex="0" center onclick="clearAll()">Clear</paper-button>
+        <paper-button raised="" role="button" tabindex="0" center on-tap="{{clearAll}}">Clear</paper-button>
       </div>
       <iframe id="hiddenframe" name="spkac" hidden></iframe>
     </form>
@@ -174,12 +203,15 @@
       ajaxResponse: function(e, r) {
         console.log("Checking account name: "+r.response.response.accountName);
         console.log("Account available: "+r.response.response.available);
-        if (typeof r.response.formuri != undefined && r.response.formuri.length > 0) {
-          this.$.form.action = r.response.formuri;
+        // Set form action url
+        if (typeof r.response.formURL != undefined && r.response.formURL.length > 0) {
+          this.$.accountform.action = r.response.formURL;
         } else {
-          //@@TODO
+          //@@TODO handle exception
         }
+        
         if (r.response.response.available === true) {
+          this.accountURI = r.response.response.accountName;
           this.$.username.isInvalid = false;
           this.$.username.style.color = '#66BB6A';
           this.$.check.hidden = true;
@@ -190,8 +222,7 @@
         }
       },
       ajaxDone: function() {
-        console.log("Done!");
-        hideCheckSpinner();
+        this.hideCheckSpinner();
       },
       toggleWebID: function() {
         if (this.$.haveWebID.checked === true) {
@@ -203,180 +234,190 @@
           this.$.email.hidden = false;
           this.$.img.hidden = false;
         }
+      },
+      ready: function() {
+        self = this;
+        this.$.accountform.addEventListener('keypress', function(e) {
+          if (e.which == 13) {
+            self.validateNew();
+          }
+        });
+
+        this.servers = [
+          { name: "rww.io [recommended]", url: 'https://rww.io/api/accountStatus', flagISO: "FR", flagName: "France" },
+          { name: "databox.me", url: 'https://databox.me/,system/accountStatus', flagISO: "US", flagName: "United States" }
+        ];
+        this.selectedEndpoint = 0;
+        var url = this.getParam('endpointUrl');
+        // fetch list of endpoints
+        if (url.length > 0) {
+          var ep = { url: url };
+          if (getParam('endpointName').length > 0) {
+            ep.name = this.getParam('endpointName');
+          } else {
+            // get the hostname from endpoint
+            var l = document.createElement("a");
+            l.href = url;
+            ep.name = l.hostname;
+          }
+          this.servers.push(ep);
+          this.selectedEndpoint = this.servers.length - 1;
+        }
+        // get more endpoints
+      },
+      updateUsername: function(e) {
+        this.$.username.style.color = '#000';
+        this.validateEmptyUser();
+      },
+      updateName: function(e) {
+        this.validateEmptyName();
+      },
+      // Check if the account is available
+      validateNew: function() {
+        this.$.check.querySelector('span').innerHTML = "Checking...";
+        this.showCheckSpinner();
+
+        var userOk = this.validateEmptyUser();
+        var nameOk = this.validateEmptyName();
+
+        if (userOk === true && nameOk === true) {
+          var data = {
+                method: "accountStatus",
+                accountName: this.$.username.querySelector('input').value
+              };
+
+          this.$.ajax.url = this.servers[this.selectedEndpoint].url;
+          this.$.ajax.method = 'POST';
+          this.$.ajax.handleAs = 'json';
+          this.$.ajax.contentType = 'application/json';
+          this.$.ajax.body = JSON.stringify(data);
+          this.$.ajax.go(); // call the API
+        }
+      },
+      // Claim account on server
+      createNew: function() {
+        this.showCreateSpinner();
+        this.$.create.querySelector('span').innerHTML = "Creating...";
+
+        username = this.$.username.querySelector('input').value;
+        var fullname = this.$.fullname.querySelector('input').value;
+        var email = this.$.email.querySelector('input').value;
+        var img = this.$.img.querySelector('input').value;
+        if (this.$.haveWebID.checked) {
+          this.$.spkacWebID.remove();
+        }
+
+        if (this.$.hiddenframe.addEventListener) {
+          this.$.hiddenframe.addEventListener("load", this.iframeLoaded, false);
+        } else {
+          this.$.hiddenframe.attachEvent("onload", this.iframeLoaded);
+        }
+
+        this.$.accountform.submit();
+
+        var isFF = 'MozAppearance' in document.documentElement.style;
+        if (isFF !== true) {
+          this.iframeLoaded();
+        }
+      },
+      iframeLoaded: function() {
+        this.$.accountform.hidden = true;
+        this.$.certname.innerHTML = this.$.fullname.querySelector('input').value;
+        this.$.accountUrl.innerHTML = '<a href="'+this.accountURI+'" target="_blank">'+this.accountURI+'</a>';
+
+        this.$.okDialog.hidden = false;
+        if (!this.$.haveWebID.checked) {
+          this.$.okAccount.hidden = false;
+        }
+      },
+      setFormToken: function() {
+        var webidToken = new Date().getTime();
+        this.$.webidToken.value = webidToken;
+        return webidToken;
+      },
+      validateEmptyUser: function() {
+        this.$.check.hidden = false;
+        this.$.create.hidden = true;
+        var user = this.$.username;
+        if (user) {
+          if (user.querySelector('input').validity.valid) {
+            user.isInvalid = false;
+          } else {
+            user.error = "Account name is required";
+            user.isInvalid = true;
+            this.hideCheckSpinner();
+            return false;
+          }
+        } else {
+          this.hideCheckSpinner();
+          console.log("Could not find: "+user);
+          return false;
+        }
+        return true;
+      },
+      validateEmptyName: function() {
+        var name = this.$.fullname;
+        if (name) {
+          if (name.querySelector('input').validity.valid) {
+            name.isInvalid = false;
+          } else if (this.$.haveWebID.checked === true) {
+            return true;
+          } else {
+            name.error = "Full name is required";
+            name.isInvalid = true;
+            this.hideCheckSpinner();
+            return false;
+          }
+        } else {
+          this.hideCheckSpinner();
+          console.log("Could not find: "+name);
+          return false;
+        }
+        return true;
+      },
+      prepareLogin: function() {
+        authWebID(this.accountURI, true);
+      },
+      clearAll: function() {
+        this.$.username.querySelector('input').value = "";
+        this.$.fullname.querySelector('input').value = "";
+        this.$.email.querySelector('input').value = "";
+        this.$.img.querySelector('input').value = "";
+      },
+      appendElement: function(elem, html) {
+        elem.insertAdjacentHTML('beforeend', html);
+      },
+      showCheckSpinner: function() {
+        this.$.checkSpinner.hidden = false;
+      },
+      hideCheckSpinner: function() {
+        this.$.check.querySelector('span').innerHTML = "Check"
+        this.$.checkSpinner.hidden = true;
+      },
+      showCreateSpinner: function() {
+        this.$.createSpinner.hidden = false;
+      },
+      hideCreateSpinner: function() {
+        this.$.createSpinner.hidden = true;
+      },
+      webidHelp: function() {
+        this.$.webidhelp.toggle();
+      },
+      endpointHelp: function() {
+        this.$.endpointshelp.toggle();
+      },
+      getParam: function(name) {
+        name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+        var regexS = "[\\?&]"+name+"=([^&#]*)";
+        var regex = new RegExp(regexS);
+        var results = regex.exec(window.location.href);
+        if( results == null ) {
+          return "";
+        } else {
+          return decodeURIComponent(results[1]);
+        }
       }
     });
 
-    document.querySelector("webid-signup").updateUsername = function(e) {
-      var d = document.querySelector("webid-signup");
-      d.$.username.style.color = '#000';
-      validateEmptyUser();
-    }
-
-    document.querySelector("webid-signup").updateName = function(e) {
-      validateEmptyName();
-    }
-
-    // Check if the account is available
-    function validateNew() {
-      var d = document.querySelector("webid-signup");
-      d.$.check.querySelector('span').innerHTML = "Checking...";
-      showCheckSpinner();
-
-      var userOk = validateEmptyUser();
-      var nameOk = validateEmptyName();
-
-      if (userOk === true && nameOk === true) {
-        var data = {
-              method: "accountStatus",
-              accountName: d.$.username.querySelector('input').value
-            };
-
-        var ajax = d.$.ajax;
-
-        ajax.method = 'POST';
-        ajax.handleAs = 'json';
-        ajax.contentType = 'application/json';
-        ajax.body = JSON.stringify(data);
-        ajax.go(); // call the API
-      }
-    }
-
-    // Claim account on server
-    function createNew() {
-      var d = document.querySelector("webid-signup");
-
-      showCreateSpinner();
-      d.$.create.querySelector('span').innerHTML = "Creating...";
-
-      username = d.$.username.querySelector('input').value;
-      var fullname = d.$.fullname.querySelector('input').value;
-      var email = d.$.email.querySelector('input').value;
-      var img = d.$.img.querySelector('input').value;
-      if (d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
-        d.$.spkacWebID.remove();
-      }
-
-      if (d.$.hiddenframe.addEventListener) {
-        d.$.hiddenframe.addEventListener("load", iframeLoaded, false);
-      } else {
-        d.$.hiddenframe.attachEvent("onload", iframeLoaded);
-      }
-
-      d.$.form.submit();
-
-      var isFF = 'MozAppearance' in document.documentElement.style;
-      if (isFF !== true) {
-        iframeLoaded();
-      }
-    }
-
-    function iframeLoaded() {
-      var d = document.querySelector("webid-signup");
-      d.$.form.hidden = true;
-
-      d.$.certname.innerHTML = d.$.fullname.querySelector('input').value;
-
-      var url = "https://"+d.$.username.querySelector('input').value+".rww.io/";
-      d.$.accountUrl.innerHTML = '<a href="'+url+'" target="_blank">'+url+'</a>';
-
-      d.$.okDialog.hidden = false;
-      if (!d.$.webidcheckbox.querySelector('paper-checkbox').checked) {
-        d.$.okAccount.hidden = false;
-      }
-    }
-
-    function setFormToken() {
-      var d = document.querySelector("webid-signup");
-      var webidToken = new Date().getTime();
-      d.$.webidToken.value = webidToken;
-      return webidToken;
-    }
-
-    function validateEmptyUser() {
-      var d = document.querySelector("webid-signup");
-      d.$.check.hidden = false;
-      d.$.create.hidden = true;
-      var user = d.$.username;
-      if (user) {
-        if (user.querySelector('input').validity.valid) {
-          user.isInvalid = false;
-        } else {
-          user.error = "Account name is required";
-          user.isInvalid = true;
-          hideCheckSpinner();
-          return false;
-        }
-      } else {
-        hideCheckSpinner();
-        console.log("Could not find: "+user);
-        return false;
-      }
-      return true;
-    }
-
-    function validateEmptyName() {
-      var d = document.querySelector("webid-signup");
-      var name = d.$.fullname;
-      if (name) {
-        if (name.querySelector('input').validity.valid) {
-          name.isInvalid = false;
-        } else if (d.$.haveWebID.checked === true) {
-          return true;
-        } else {
-          name.error = "Full name is required";
-          name.isInvalid = true;
-          hideCheckSpinner();
-          return false;
-        }
-      } else {
-        hideCheckSpinner();
-        console.log("Could not find: "+name);
-        return false;
-      }
-      return true;
-    }
-
-    function prepareLogin() {
-      var d = document.querySelector("webid-signup");
-      authWebID(d.$.username.querySelector('input').value+".rww.io/", true);
-    }
-
-    function clearAll() {
-      var d = document.querySelector("webid-signup");
-      d.$.username.querySelector('input').value = "";
-      d.$.fullname.querySelector('input').value = "";
-      d.$.email.querySelector('input').value = "";
-      d.$.img.querySelector('input').value = "";
-    }
-
-    function appendElement(elem, html) {
-      elem.insertAdjacentHTML('beforeend', html);
-    }
-
-    function showCheckSpinner() {
-      var d = document.querySelector("webid-signup");
-      d.$.checkSpinner.hidden = false;
-    }
-
-    function hideCheckSpinner() {
-      var d = document.querySelector("webid-signup");
-      d.$.check.querySelector('span').innerHTML = "Check"
-      d.$.checkSpinner.hidden = true;
-    }
-
-    function showCreateSpinner() {
-      var d = document.querySelector("webid-signup");
-      d.$.createSpinner.hidden = false;
-    }
-
-    function hideCreateSpinner() {
-      var d = document.querySelector("webid-signup");
-      d.$.createSpinner.hidden = true;
-    }
-
-    function webidHelp() {
-      var d = document.querySelector("webid-signup");
-      var h = d.$.webidhelp.toggle();
-    }
   </script>
 </polymer-element>
