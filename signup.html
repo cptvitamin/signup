@@ -175,7 +175,7 @@
           <paper-dropdown class="dropdown" layered>
             <core-menu class="menu" selected="{{selectedEndpoint}}">
               <template repeat="{{s in servers}}">
-                <paper-item id="{{s.url}}"><flag-icon key="{{s.flagISO}}" width="16"></flag-icon>&nbsp;{{s.name}}</paper-item>
+                <paper-item id="{{s.url}}"><flag-icon key="{{s.flagISO}}" width="16" img></flag-icon>&nbsp;{{s.name}}</paper-item>
               </template>
             </core-menu>
           </paper-dropdown>
@@ -201,7 +201,7 @@
   <script>
     Polymer({
       ajaxResponse: function(e, r) {
-        console.log("Checking account name: "+r.response.response.accountName);
+        console.log("Account URL: "+r.response.response.accountURL);
         console.log("Account available: "+r.response.response.available);
         // Set form action url
         if (typeof r.response.formURL != undefined && r.response.formURL.length > 0) {
@@ -211,7 +211,7 @@
         }
         
         if (r.response.response.available === true) {
-          this.accountURI = r.response.response.accountName;
+          this.accountURI = r.response.response.accountURL;
           this.$.username.isInvalid = false;
           this.$.username.style.color = '#66BB6A';
           this.$.check.hidden = true;
@@ -244,8 +244,8 @@
         });
 
         this.servers = [
-          { name: "rww.io [recommended]", url: 'https://rww.io/api/accountStatus', flagISO: "FR", flagName: "France" },
-          { name: "databox.me", url: 'https://databox.me/,system/accountStatus', flagISO: "US", flagName: "United States" }
+          { name: "rww.io [recommended]", url: 'https://rww.io/api/accountStatus', flagISO: "fr" },
+          { name: "databox.me", url: 'https://databox.me/,system/accountStatus', flagISO: "us" }
         ];
         this.selectedEndpoint = 0;
         var url = this.getParam('endpointUrl');
@@ -259,6 +259,9 @@
             var l = document.createElement("a");
             l.href = url;
             ep.name = l.hostname;
+          }
+          if (getParam('flagISO').length > 0) {
+            ep.flagISO = getParam('flagISO');
           }
           this.servers.push(ep);
           this.selectedEndpoint = this.servers.length - 1;
