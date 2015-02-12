@@ -86,13 +86,13 @@ The signup component already comes with a list of predefined service providers (
  * ```endpointName``` - a common name for the endpoint; if no name is provided, it will default to the host name
  * ```flagISO``` - a country code in the [ISO 3166-1](https://en.wikipedia.org/wiki/ISO_3166-1) Alpha-2 format (e.g. FR, DE, US )
 
-For example, if the signup component is locate at ```https://linkeddata.github.io/signup/```, and if you have a service provider endpoint at ```https://example.org/api/accountStatus```, and let's say it is located in Germany, then the corresponding override URL will be:
+For example, if the signup component is located at ```https://linkeddata.github.io/signup/```, and if you have a service provider endpoint at ```https://example.org/api/accountStatus```, and let's say it is located in Germany, then the corresponding override URL will be:
 
 ```
 https://linkeddata.github.io/signup/?endpointUrl=https%3a%2f%2fexample.org%2fapi%2faccountStatus&flagISO=de
 ```
 
-Remember that if provided, the new service provider defined by endpointUrl will take precedence over the rest in the list.
+Remember that if provided, the new service provider defined by endpointUrl will become the default in the list.
 
 Client - server API
 -------------------
