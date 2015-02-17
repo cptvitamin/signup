@@ -97,7 +97,23 @@
       }
     });
 
+    function getParam(name) {
+        name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+        var regexS = "[\\?&]"+name+"=([^&#]*)";
+        var regex = new RegExp(regexS);
+        var results = regex.exec(window.location.href);
+        if( results == null ) {
+          return "";
+        } else {
+          return decodeURIComponent(results[1]);
+        }
+      }
+
     window.addEventListener('WebComponentsReady', function(e) {
+        var tab = getParam("tab");
+        if (tab.length > 0) {
+          tabs.selected = tab;
+        }
         console.log("Done importing components!");
     });
   </script>
