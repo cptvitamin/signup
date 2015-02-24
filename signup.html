@@ -136,9 +136,11 @@
         </p>
       </div>
       <div id="finish">
-        <p>Please click the button below to finish creating your profile. You will be asked for your new certificate <em>twice</em>. Your new certificate should have the following name: <em><span id="certname"></span></em>.</p>
-        <p><span class="warning">Attention:</span> do not proceed unless your certificate was installed successfully.
-        </p>
+        <p>Please click the button below to finish creating your account. You may be asked for your new certificate <em>twice</em>.</p>
+        <div id="warncert">
+          <p>Your new certificate should have the following name: <em><span id="certname"></span></em>.</p>
+          <p><span class="warning">Attention:</span> do not proceed unless your certificate was installed successfully.</p>
+        </div>
         <div id="profilestatus"></div>
         <paper-button id="finishlogin" raised="" role="button" class="greencolored" tabindex="0" center on-tap="{{prepareLogin}}">Finish</paper-button>
       </div>
@@ -308,6 +310,7 @@
         var img = this.$.img.querySelector('input').value;
         if (this.$.haveWebID.checked) {
           this.$.spkacWebID.remove();
+          this.$.warncert.hidden = true;
         }
 
         if (this.$.hiddenframe.addEventListener) {

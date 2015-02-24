@@ -191,33 +191,87 @@ function setACL(uri, aclURI, webid, ws, dom) {
 // string account (https://user.rww.io/)
 // bool   dom     (append info to dom)
 function createPref(webid, account, dom) {
+  console.log("Creating preferences");
+
+  var exists = false;
   if (dom) {
     var d = document.querySelector("webid-signup");
-    d.appendElement(d.$.profilestatus, '<p>Creating preferences file...<core-icon id="prefdone" icon="done" class="greencolor" hidden></core-icon></p>');
+    d.appendElement(d.$.profilestatus, '<p>Updating preferences file...<core-icon id="prefdone" icon="done" class="greencolor" hidden></core-icon></p>');
+    exists = d.$.haveWebID.checked;
   }
 
   var g = new $rdf.graph();
-  g.add($rdf.sym(webid), WS('preferencesFile'), $rdf.sym(''));
+  if (!exists) {
+    g.add($rdf.sym(webid), WS('preferencesFile'), $rdf.sym(''));  
+  }
   workspaces.forEach(function(workspace) {
-    g.add($rdf.sym(webid), WS('workspace'), $rdf.sym(account+workspace.name+'/'));
+    g.add($rdf.sym(webid), WS('workspace'), $rdf.sym(account+workspace+'/'));
   });
   
+  var prefURI = account+'Preferences/prefs';
   var s = new $rdf.Serializer(g).toN3(g);
 
+  if (exists) {
+    // fetch profile and append to preferences graph
+    var kb = new $rdf.graph();
+    var kf = new $rdf.fetcher(kb, TIMEOUT);
+    var docURI = webid.slice(0, webid.indexOf('#'));
+
+    kf.nowOrWhenFetched(docURI,undefined,function(ok, body, xhr) {
+      if (!ok) {
+        console.log("Could not load profile: HTTP "+xhr.status);
+      } else {
+        p = kb.any($rdf.sym(webid), WS('preferencesFile'));
+        if (p && p.value.length > 0) {
+          prefURI = p.value;
+          // fetch preferences file from profile
+          pg = new $rdf.graph();
+          var f = new $rdf.fetcher(pg, TIMEOUT);
+          f.nowOrWhenFetched(prefURI,undefined,function(ok, body, xhr) {
+            var triples = pg.statementsMatching(undefined, undefined, undefined, $rdf.sym(prefURI));
+            // add existing triples from pref file
+            triples.forEach(function(st) {
+              g.addStatement(st);
+            });
+            s = new $rdf.Serializer(g).toN3(g);
+            writePref(prefURI, s, exists, dom);
+          });
+        } else {
+          writePref(prefURI, s, exists, dom);
+        }
+      }
+    });
+  } else {
+    writePref(prefURI, s, exists, dom);
+  }
+}
+
+// update WebID profile to include the preferences file
+// string WebID   (https://user.rww.io/profile/card#me)
+// string prefURI (https://user.rww.io/Preferences/prefs)
+// bool   dom     (append info to dom)
+function writePref(prefURI, graph, exists, dom) {
+  if (dom) {
+    var d = document.querySelector("webid-signup");    
+  }
   var xhr = new XMLHttpRequest();
-  xhr.open("PUT", account+'Preferences/prefs', true);
+  xhr.open("PUT", prefURI, true);
   xhr.setRequestHeader("Content-Type", "text/turtle");
   xhr.withCredentials = true;
-  xhr.send(s);
+  xhr.send(graph);
 
   xhr.onreadystatechange = function () {
     if (xhr.readyState == xhr.DONE) {
       if (xhr.status == 200 || xhr.status == 201) {
           if (dom) {
             d.$.profilestatus.querySelector('#prefdone').hidden = false;
+            if (exists) {
+              d.$.alldone.hidden = false;
+            }
             window.scrollTo(0,document.body.scrollHeight);
+          } else {
+            updateProfile(webid, account+'Preferences/prefs', dom);
           }
-          updateProfile(webid, account+'Preferences/prefs', dom);
       } else {
         console.log("Could not write pref file "+account+"Preferences/prefs | HTTP status: "+xhr.status);
       }
