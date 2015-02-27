@@ -327,13 +327,18 @@
         }
       },
       iframeLoaded: function() {
-        this.$.accountform.hidden = true;
-        this.$.certname.innerHTML = this.$.fullname.querySelector('input').value;
-        this.$.accountUrl.innerHTML = '<a href="'+this.accountURI+'" target="_blank">'+this.accountURI+'</a>';
+        if (!this.$) {
+          that = document.querySelector("webid-signup");
+        } else {
+          that = this;
+        }
+        that.$.accountform.hidden = true;
+        that.$.certname.innerHTML = that.$.fullname.querySelector('input').value;
+        that.$.accountUrl.innerHTML = '<a href="'+that.accountURI+'" target="_blank">'+that.accountURI+'</a>';
 
-        this.$.okDialog.hidden = false;
-        if (!this.$.haveWebID.checked) {
-          this.$.okAccount.hidden = false;
+        that.$.okDialog.hidden = false;
+        if (!that.$.haveWebID.checked) {
+          that.$.okAccount.hidden = false;
         }
       },
       setFormToken: function() {

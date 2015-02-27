@@ -82,55 +82,6 @@ function finishAccount(webid, account, dom) {
     }
     createWS(ws, wsCount, webid, account, dom);
   });
-
-  // observer for the workspace counter
-  Object.observe(wsCount, function(changes) {
-    changes.forEach(function(change) {
-      if (change.object.counter === workspaces.length) {
-        createPref(wsCount.webid, wsCount.account, dom);
-      } else {
-        // console.log("workspaces done: "+change.object.counter);
-      }
-    });
-  });
-};
-
-// Create a new workspace
-// string ws      (workspace name -- e.g. Friends)
-// object wsCount (workspace counter object)
-// string WebID   (https://user.rww.io/profile/card#me)
-// string account (https://user.rww.io/)
-// bool   dom     (append info to dom)
-function createWS(ws, wsCount, webid, account, dom) {
-  if (dom) {
-    var d = document.querySelector("webid-signup");
-    d.$.profilestatus.querySelector('#'+ws).hidden = false;
-  }
-
-  var uri = account+ws+'/';
-  var xhr = new XMLHttpRequest();
-  xhr.open("PUT", uri, true);
-  xhr.setRequestHeader("Content-Type", "text/turtle");
-  xhr.setRequestHeader("Link", '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"');
-  xhr.withCredentials = true;
-  xhr.send();
-
-  xhr.onreadystatechange = function () {
-    if (xhr.readyState == xhr.DONE) {
-      if (xhr.status == 200 || xhr.status == 201) {
-        var acl = parseLinkHeader(xhr.getResponseHeader('Link'));
-        var aclURI = acl['acl']['href'];
-        setACL(uri, aclURI, webid, ws, dom);
-        if (dom) {
-          d.$.profilestatus.querySelector('#done'+ws).hidden = false;
-          window.scrollTo(0,document.body.scrollHeight);
-        }
-        wsCount.counter++;
-      } else {
-        console.log("Could not create "+ws+" | HTTP status: "+xhr.status);
-      }
-    }
-  };
 };
 
 // Set acls for a given resource
@@ -186,6 +137,49 @@ function setACL(uri, aclURI, webid, ws, dom) {
   };
 };
 
+// Create a new workspace
+// string ws      (workspace name -- e.g. Friends)
+// object wsCount (workspace counter object)
+// string WebID   (https://user.rww.io/profile/card#me)
+// string account (https://user.rww.io/)
+// bool   dom     (append info to dom)
+function createWS(ws, wsCount, webid, account, dom) {
+  if (dom) {
+    var d = document.querySelector("webid-signup");
+    d.$.profilestatus.querySelector('#'+ws).hidden = false;
+  }
+
+  var uri = account+ws+'/';
+  var xhr = new XMLHttpRequest();
+  xhr.open("PUT", uri, true);
+  xhr.setRequestHeader("Content-Type", "text/turtle");
+  xhr.setRequestHeader("Link", '<http://www.w3.org/ns/ldp#BasicContainer>; rel="type"');
+  xhr.withCredentials = true;
+  xhr.send();
+
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == xhr.DONE) {
+      if (xhr.status == 200 || xhr.status == 201) {
+        var acl = parseLinkHeader(xhr.getResponseHeader('Link'));
+        var aclURI = acl['acl']['href'];
+        setACL(uri, aclURI, webid, ws, dom);
+        if (dom) {
+          d.$.profilestatus.querySelector('#done'+ws).hidden = false;
+          window.scrollTo(0,document.body.scrollHeight);
+        }
+        wsCount.counter++;
+        console.log("Workspaces done: "+workspaces.length);
+        if (wsCount.counter == workspaces.length) {
+          console.log("Creating prefs");
+          createPref(wsCount.webid, wsCount.account, dom);
+        }
+      } else {
+        console.log("Could not create "+ws+" | HTTP status: "+xhr.status);
+      }
+    }
+  };
+};
+
 // Create the preferences file
 // string WebID   (https://user.rww.io/profile/card#me)
 // string account (https://user.rww.io/)
@@ -197,7 +191,9 @@ function createPref(webid, account, dom) {
   if (dom) {
     var d = document.querySelector("webid-signup");
     d.appendElement(d.$.profilestatus, '<p>Updating preferences file...<core-icon id="prefdone" icon="done" class="greencolor" hidden></core-icon></p>');
-    exists = d.$.haveWebID.checked;
+    if (d.$.haveWebID && d.$.haveWebID.checked) {
+      exists = true;
+    }
   }
 
   var g = new $rdf.graph();
@@ -234,15 +230,15 @@ function createPref(webid, account, dom) {
               g.addStatement(st);
             });
             s = new $rdf.Serializer(g).toN3(g);
-            writePref(prefURI, s, exists, dom);
+            writePref(webid, prefURI, s, exists, dom);
           });
         } else {
-          writePref(prefURI, s, exists, dom);
+          writePref(webid, prefURI, s, exists, dom);
         }
       }
     });
   } else {
-    writePref(prefURI, s, exists, dom);
+    writePref(webid, prefURI, s, exists, dom);
   }
 }
 
@@ -250,7 +246,7 @@ function createPref(webid, account, dom) {
 // string WebID   (https://user.rww.io/profile/card#me)
 // string prefURI (https://user.rww.io/Preferences/prefs)
 // bool   dom     (append info to dom)
-function writePref(prefURI, graph, exists, dom) {
+function writePref(webid, prefURI, graph, exists, dom) {
   if (dom) {
     var d = document.querySelector("webid-signup");    
   }
@@ -263,14 +259,14 @@ function writePref(prefURI, graph, exists, dom) {
   xhr.onreadystatechange = function () {
     if (xhr.readyState == xhr.DONE) {
       if (xhr.status == 200 || xhr.status == 201) {
-          if (dom) {
-            d.$.profilestatus.querySelector('#prefdone').hidden = false;
-            if (exists) {
+          if (exists) {
+            if (dom) {
+              d.$.profilestatus.querySelector('#prefdone').hidden = false;
               d.$.alldone.hidden = false;
+              window.scrollTo(0,document.body.scrollHeight);
             }
-            window.scrollTo(0,document.body.scrollHeight);
           } else {
-            updateProfile(webid, account+'Preferences/prefs', dom);
+            updateProfile(webid, prefURI, dom);
           }
       } else {
         console.log("Could not write pref file "+account+"Preferences/prefs | HTTP status: "+xhr.status);
