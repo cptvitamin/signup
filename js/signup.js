@@ -203,7 +203,9 @@ function createPref(webid, account, dom) {
   workspaces.forEach(function(workspace) {
     g.add($rdf.sym(webid), WS('workspace'), $rdf.sym(account+workspace+'/'));
   });
-  
+  // add space
+  g.add($rdf.sym(webid), WS('storage'), $rdf.sym(account));
+
   var prefURI = account+'Preferences/prefs';
   var s = new $rdf.Serializer(g).toN3(g);
 
