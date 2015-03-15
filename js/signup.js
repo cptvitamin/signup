@@ -232,15 +232,15 @@ function createPref(webid, account, dom) {
               g.addStatement(st);
             });
             s = new $rdf.Serializer(g).toN3(g);
-            writePref(webid, prefURI, s, exists, dom);
+            writePref(webid, prefURI, s, exists, account, dom);
           });
         } else {
-          writePref(webid, prefURI, s, exists, dom);
+          writePref(webid, prefURI, s, exists, account, dom);
         }
       }
     });
   } else {
-    writePref(webid, prefURI, s, exists, dom);
+    writePref(webid, prefURI, s, exists, account, dom);
   }
 }
 
@@ -248,7 +248,7 @@ function createPref(webid, account, dom) {
 // string WebID   (https://user.rww.io/profile/card#me)
 // string prefURI (https://user.rww.io/Preferences/prefs)
 // bool   dom     (append info to dom)
-function writePref(webid, prefURI, graph, exists, dom) {
+function writePref(webid, prefURI, graph, exists, account, dom) {
   if (dom) {
     var d = document.querySelector("webid-signup");    
   }
@@ -268,7 +268,7 @@ function writePref(webid, prefURI, graph, exists, dom) {
               window.scrollTo(0,document.body.scrollHeight);
             }
           } else {
-            updateProfile(webid, prefURI, dom);
+            updateProfile(webid, prefURI, account, dom);
           }
       } else {
         console.log("Could not write pref file "+account+"Preferences/prefs | HTTP status: "+xhr.status);
@@ -281,7 +281,7 @@ function writePref(webid, prefURI, graph, exists, dom) {
 // string WebID   (https://user.rww.io/profile/card#me)
 // string prefURI (https://user.rww.io/Preferences/prefs)
 // bool   dom     (append info to dom)
-function updateProfile(webid, prefURI, dom) {
+function updateProfile(webid, prefURI, account, dom) {
   if (dom) {
     var d = document.querySelector("webid-signup");
     d.appendElement(d.$.profilestatus, '<p>Updating WebID profile...<core-icon id="profdone" icon="done" class="greencolor" hidden></core-icon></p>');
@@ -301,6 +301,7 @@ function updateProfile(webid, prefURI, dom) {
       });
       // add link to preference file
       g.add($rdf.sym(webid), WS('preferencesFile'), $rdf.sym(prefURI));
+      g.add($rdf.sym(webid), WS('storage'), $rdf.sym(account));
       var s = new $rdf.Serializer(g).toN3(g);
 
       // update profile
